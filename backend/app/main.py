@@ -9,7 +9,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 API_PREFIX = "/api/v1"
-DEFAULT_ORIGINS = "http://localhost:5173,http://127.0.0.1:5173"
+DEFAULT_ORIGINS = (
+    "http://localhost:5173,http://127.0.0.1:5173,"
+    "https://proteccion-datos-web.vercel.app"
+)
 ALLOWED_ORIGINS = [
     origin.strip()
     for origin in os.getenv("FRONTEND_ORIGINS", DEFAULT_ORIGINS).split(",")
