@@ -12,6 +12,7 @@ export default function ChatbotWidget({ standalone = false }) {
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [minimized, setMinimized] = useState(false)
+  const [suggestions, setSuggestions] = useState(() => t.chatbot.options)
   const bottomRef = useRef(null)
   const inputRef = useRef(null)
   const sessionId = useRef(crypto.randomUUID())
@@ -29,11 +30,13 @@ export default function ChatbotWidget({ standalone = false }) {
 
     setInput('')
     setMessages(m => [...m, { from: 'user', text: userText, time: now() }])
+    setSuggestions([])
     setLoading(true)
 
     try {
       const data = await chatbotService.sendMessage(userText, sessionId.current)
       setMessages(m => [...m, { from: 'bot', text: data.reply, time: now() }])
+      setSuggestions(data.suggestions || [])
     } catch {
       setMessages(m => [...m, {
         from: 'bot',
@@ -100,10 +103,10 @@ export default function ChatbotWidget({ standalone = false }) {
           <div ref={bottomRef} />
         </div>
 
-        {/* Quick options */}
-        {messages.length === 1 && (
+        {/* Guided options returned by the backend */}
+        {suggestions.length > 0 && !loading && (
           <div className="chatbot-widget__options">
-            {t.chatbot.options.map((opt, i) => (
+            {suggestions.map((opt, i) => (
               <button
                 key={i}
                 className="chatbot-option"
@@ -139,7 +142,9 @@ export default function ChatbotWidget({ standalone = false }) {
           </button>
         </div>
 
-        <p className="chatbot-widget__notice">{t.chatbot.comingSoon}</p>
+        <p className="chatbot-widget__notice">
+          Orientación educativa e informativa; no sustituye asesoría legal ni atención de emergencias.
+        </p>
       </div>
     </div>
   )
