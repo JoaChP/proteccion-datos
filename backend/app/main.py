@@ -115,18 +115,23 @@ SIMULATIONS = {
 ASSESSMENT = [
     ("Contraseñas", "¿Cómo gestiona sus contraseñas?", "Uso una única y compleja por cuenta", "Reutilizo alguna en cuentas secundarias", "Uso la misma o variaciones simples"),
     ("Contraseñas", "¿Tiene 2FA activado?", "En todas mis cuentas importantes", "Solo en algunas", "En ninguna"),
+    ("Contraseñas", "¿Con qué frecuencia cambia sus contraseñas?", "Cada 3 a 6 meses o ante sospecha", "Aproximadamente una vez al año", "Solo si la plataforma me obliga"),
     ("Contraseñas", "¿Comparte contraseñas?", "Nunca", "Solo en un caso excepcional", "Sí, con frecuencia"),
     ("Navegación", "Antes de ingresar datos, ¿verifica el sitio?", "Reviso dominio y HTTPS", "Solo si parece extraño", "No lo verifico"),
     ("Navegación", "¿Usa Wi-Fi público para banca o compras?", "No", "Solo ocasionalmente", "Sí, con frecuencia"),
     ("Navegación", "¿Abre enlaces inesperados?", "No; verifico antes", "A veces", "Sí, normalmente"),
+    ("Navegación", "¿Actualiza sus dispositivos y aplicaciones?", "Sí, regularmente", "Solo a veces", "Casi nunca"),
     ("Redes sociales", "¿Quién puede ver su información?", "Solo contactos conocidos", "Depende de la red", "Cualquier persona"),
     ("Redes sociales", "¿Revisa apps conectadas a sus perfiles?", "Sí, periódicamente", "Rara vez", "Nunca"),
     ("Redes sociales", "¿Comparte cédula, dirección o datos financieros?", "Nunca", "Solo si creo que es necesario", "Sí, con facilidad"),
+    ("Redes sociales", "¿Acepta solicitudes de personas desconocidas?", "No", "A veces", "Sí, normalmente"),
     ("Compras en línea", "¿Cómo evalúa una tienda?", "Verifico identidad, reputación y sitio", "Solo miro el precio", "Compro sin verificar"),
     ("Compras en línea", "¿Cómo paga en internet?", "Con métodos seguros y controlados", "Con mi tarjeta habitual", "Envío datos por cualquier medio"),
+    ("Compras en línea", "¿Lee políticas de privacidad?", "Sí, antes de entregar datos", "Solo parcialmente", "Nunca"),
     ("Compras en línea", "¿Guarda comprobantes?", "Sí, siempre", "Solo algunos", "No"),
     ("Derechos digitales", "¿Conoce sus derechos sobre datos?", "Acceso, rectificación y supresión", "Conozco algunos", "No los conozco"),
     ("Derechos digitales", "¿Sabe cómo acudir a PRODHAB?", "Sí, sé que debo conservar evidencia y revisar su trámite", "Sé que existe, pero no el proceso", "No"),
+    ("Derechos digitales", "¿Reconoce datos personales sensibles?", "Sí, identifico documentos, salud y datos financieros", "Reconozco algunos", "No los distingo"),
     ("Derechos digitales", "¿Revisa permisos y privacidad de apps?", "Sí, antes de instalarlas", "Solo los permisos visibles", "No"),
 ]
 
@@ -181,9 +186,9 @@ def answer_message(message: str, session_id: str) -> ChatReply:
             return assessment_question(session_id)
         score = state["score"]
         SESSIONS.pop(session_id, None)
-        if score <= 9:
+        if score <= 12:
             result = "Nivel preventivo bajo: mantenga sus prácticas y revise periódicamente accesos, permisos y actualizaciones."
-        elif score <= 20:
+        elif score <= 26:
             result = "Nivel preventivo moderado: priorice contraseñas únicas, 2FA, actualizaciones y revisión de privacidad."
         else:
             result = "Nivel preventivo alto: cambie primero las claves del correo y banca, active 2FA, retire accesos desconocidos y evite enlaces no verificados."
