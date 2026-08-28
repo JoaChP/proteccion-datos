@@ -1,16 +1,8 @@
 import { useState, useRef, useEffect } from 'react'
 import { Send, Bot, ChevronRight, X, Minimize2 } from 'lucide-react'
 import { useLang } from '../../hooks/useLang'
+import { chatbotService } from '../../services/api'
 import './ChatbotWidget.css'
-
-// NOTE: Replace this stub with chatbotService.sendMessage() from src/services/api.js
-async function mockSendMessage(message) {
-  await new Promise(r => setTimeout(r, 800))
-  return {
-    reply: '🚧 El chatbot estará disponible próximamente. Este frontend está listo para conectarse al backend Python/FastAPI.',
-    suggestions: ['Saber más sobre la Ley 8968', 'Ver recursos educativos'],
-  }
-}
 
 export default function ChatbotWidget({ standalone = false }) {
   const { t } = useLang()
@@ -22,6 +14,7 @@ export default function ChatbotWidget({ standalone = false }) {
   const [minimized, setMinimized] = useState(false)
   const bottomRef = useRef(null)
   const inputRef = useRef(null)
+  const sessionId = useRef(crypto.randomUUID())
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -39,9 +32,7 @@ export default function ChatbotWidget({ standalone = false }) {
     setLoading(true)
 
     try {
-      // TODO: replace with real API call:
-      // const data = await chatbotService.sendMessage(userText, sessionId)
-      const data = await mockSendMessage(userText)
+      const data = await chatbotService.sendMessage(userText, sessionId.current)
       setMessages(m => [...m, { from: 'bot', text: data.reply, time: now() }])
     } catch {
       setMessages(m => [...m, {
