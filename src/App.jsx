@@ -6,6 +6,7 @@ import Footer from './components/layout/Footer'
 import HomePage from './pages/HomePage'
 import ChatbotPage from './pages/ChatbotPage'
 import PlaceholderPage from './pages/PlaceholderPage'
+import ProtectionDataPage from './pages/ProtectionDataPage'
 
 export default function App() {
   return (
@@ -21,7 +22,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/chatbot" element={<ChatbotPage />} />
-          <Route path="/proteccion-datos" element={<PlaceholderPage title="Protección de Datos Personales" />} />
+          <Route path="/proteccion-datos" element={<ProtectionDataPage />}/>
           <Route path="/seguridad-digital" element={<PlaceholderPage title="Seguridad Digital" />} />
           <Route path="/recursos" element={<PlaceholderPage title="Recursos Educativos" />} />
           <Route path="/riesgos" element={<PlaceholderPage title="Riesgos Comunes" />} />
