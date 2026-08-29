@@ -26,8 +26,9 @@
 }
 
 .protection-data__hero-content {
-  width: min(1100px, 100%);
-  margin: 0 auto;
+  width: min(1100px, calc(100% - 340px));
+  margin-left: 300px;
+  margin-right: auto;
 }
 
 .protection-data__eyebrow {
@@ -78,8 +79,9 @@
    ========================================================= */
 
 .protection-data__intro {
-  width: min(1100px, 100%);
-  margin: 0 auto;
+  width: min(1100px, calc(100% - 340px));
+  margin-left: 300px;
+  margin-right: auto;
   padding: 2.5rem 1.5rem 1rem;
 }
 
@@ -548,6 +550,8 @@
     left: 1rem;
   }
 
+  .protection-data__hero-content,
+  .protection-data__intro,
   .protection-data__content,
   .protection-data__closing {
     width: calc(100% - 290px);
@@ -608,6 +612,8 @@
     font-size: 0.7rem;
   }
 
+  .protection-data__hero-content,
+  .protection-data__intro,
   .protection-data__content,
   .protection-data__closing {
     width: 100%;
@@ -651,6 +657,9 @@
 
   .protection-data__hero-content {
     width: 100%;
+    max-width: none;
+    margin-left: 0;
+    margin-right: 0;
   }
 
   .protection-data__hero h1 {
