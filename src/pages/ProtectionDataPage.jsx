@@ -923,25 +923,36 @@ function SectionBlock({ block }) {
 
 function ReferencesList({ references }) {
   return (
-    <div className="protection-data__references">
+    <div className="protection-data__reference-list">
       {references.map((reference, index) => (
-        <p
-          key={`${reference.author}-${reference.year}-${index}`}
+        <div
           className="protection-data__reference"
+          key={`${reference.author}-${reference.year}-${index}`}
         >
-          <span className="protection-data__reference-author">
-            {reference.author}
-          </span>{' '}
-          ({reference.year}).{' '}
-          <em>{reference.title}</em>.{' '}
-          {reference.source}
-          {reference.url && (
-            <>
-              {' '}
-              {reference.url}
-            </>
-          )}
-        </p>
+          <p>
+            <span className="protection-data__reference-author">
+              {reference.author}
+            </span>{' '}
+            ({reference.year}).{' '}
+            <em>{reference.title}</em>.
+            {reference.source &&
+              reference.source !== reference.author && (
+                <>
+                  {' '}
+                  {reference.source}.
+                </>
+              )}{' '}
+            {reference.url && (
+              <a
+                href={reference.url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {reference.url}
+              </a>
+            )}
+          </p>
+        </div>
       ))}
     </div>
   )
@@ -1031,25 +1042,34 @@ export default function ProtectionDataPage() {
 
       <nav
         className="protection-data__navigation"
-        aria-label="Contenido de Protección de Datos"
+        aria-label="Índice de Protección de Datos"
       >
-        {sections.map((section, index) => (
-          <a
-            key={section.id}
-            href={`#${section.id}`}
-            className="protection-data__nav-item"
-          >
-            <span>
-              {String(index + 1).padStart(2, '0')}
-            </span>
+        <div className="protection-data__navigation-header">
+          <span>ÍNDICE</span>
+          <strong>Protección de Datos</strong>
+        </div>
 
-            <span>{section.icon}</span>
+        <div className="protection-data__navigation-list">
+          {sections.map((section, index) => (
+            <a
+              key={section.id}
+              href={`#${section.id}`}
+              className="protection-data__nav-item"
+            >
+              <span className="protection-data__nav-number">
+                {String(index + 1).padStart(2, '0')}
+              </span>
 
-            <strong>
-              {section.title.replace(/^\d+\.\s/, '')}
-            </strong>
-          </a>
-        ))}
+              <span className="protection-data__nav-icon">
+                {section.icon}
+              </span>
+
+              <strong>
+                {section.title.replace(/^\d+\.\s/, '')}
+              </strong>
+            </a>
+          ))}
+        </div>
       </nav>
 
       {/* =====================================================
@@ -1063,7 +1083,7 @@ export default function ProtectionDataPage() {
             id={section.id}
             className={`protection-data__section${
               section.id === 'referencias'
-                ? ' protection-data__section--references'
+                ? ' protection-data__references'
                 : ''
             }`}
           >
