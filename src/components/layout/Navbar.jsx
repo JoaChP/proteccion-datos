@@ -9,7 +9,7 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const { theme, toggleTheme } = useTheme()
-  const { lang, t, toggleLang } = useLang()
+  const { lang, t, setLanguage, supportedLanguages } = useLang()
   const location = useLocation()
 
   useEffect(() => {
@@ -62,14 +62,24 @@ export default function Navbar() {
         {/* Controls */}
         <div className="navbar__controls">
           <button
-            className="navbar__icon-btn"
-            onClick={toggleLang}
+            className="navbar__icon-btn navbar__legacy-language"
+            onClick={() => setLanguage(lang === 'es' ? 'en' : 'es')}
             aria-label={`Cambiar idioma (${lang === 'es' ? 'EN' : 'ES'})`}
             title={lang === 'es' ? 'Switch to English' : 'Cambiar a Español'}
           >
             <Globe size={18} />
             <span className="navbar__lang-label">{lang.toUpperCase()}</span>
           </button>
+
+          <label className="navbar__language-control" title="Cambiar idioma">
+            <Globe size={16} />
+            <span className="sr-only">Cambiar idioma</span>
+            <select value={lang} onChange={(event) => setLanguage(event.target.value)} aria-label="Cambiar idioma">
+              {supportedLanguages.map(({ code, label }) => (
+                <option key={code} value={code}>{label}</option>
+              ))}
+            </select>
+          </label>
 
           <button
             className="navbar__icon-btn"

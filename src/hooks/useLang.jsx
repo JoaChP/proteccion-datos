@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 
 const translations = {
   es: {
@@ -177,18 +177,78 @@ const translations = {
 
 const LangContext = createContext()
 
+const supportedLanguages = [
+  { code: 'es', label: 'Español' },
+  { code: 'en', label: 'English' },
+  { code: 'fr', label: 'Français' },
+  { code: 'pt', label: 'Português' },
+  { code: 'de', label: 'Deutsch' },
+  { code: 'it', label: 'Italiano' },
+  { code: 'ja', label: '日本語' },
+  { code: 'zh-CN', label: '中文' },
+]
+
+function GoogleTranslate({ language }) {
+  const [ready, setReady] = useState(false)
+
+  useEffect(() => {
+    const initialize = () => {
+      if (!window.google?.translate || document.querySelector('.goog-te-combo')) return
+      new window.google.translate.TranslateElement(
+        {
+          pageLanguage: 'es',
+          includedLanguages: supportedLanguages.map(({ code }) => code).filter(code => code !== 'es').join(','),
+          autoDisplay: false,
+        },
+        'google-translate-element',
+      )
+      setReady(true)
+    }
+
+    window.googleTranslateElementInit = initialize
+    if (window.google?.translate) {
+      initialize()
+      return undefined
+    }
+
+    if (!document.getElementById('google-translate-script')) {
+      const script = document.createElement('script')
+      script.id = 'google-translate-script'
+      script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit'
+      script.async = true
+      document.body.appendChild(script)
+    }
+    return undefined
+  }, [])
+
+  useEffect(() => {
+    if (!ready) return
+    const select = document.querySelector('.goog-te-combo')
+    if (!select) return
+    select.value = language === 'es' ? '' : language
+    select.dispatchEvent(new Event('change'))
+  }, [language, ready])
+
+  return <div id="google-translate-element" aria-hidden="true" />
+}
+
 export function LangProvider({ children }) {
   const [lang, setLang] = useState(() => localStorage.getItem('lang') || 'es')
 
-  const t = translations[lang]
-  const toggleLang = () => {
-    const next = lang === 'es' ? 'en' : 'es'
+  // All source copy remains Spanish and is translated consistently at runtime.
+  const t = translations.es
+  const setLanguage = (next) => {
     setLang(next)
     localStorage.setItem('lang', next)
   }
+  const toggleLang = () => {
+    const next = lang === 'es' ? 'en' : 'es'
+    setLanguage(next)
+  }
 
   return (
-    <LangContext.Provider value={{ lang, t, toggleLang }}>
+    <LangContext.Provider value={{ lang, t, toggleLang, setLanguage, supportedLanguages }}>
+      <GoogleTranslate language={lang} />
       {children}
     </LangContext.Provider>
   )

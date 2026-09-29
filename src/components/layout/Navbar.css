@@ -127,6 +127,40 @@
   letter-spacing: 0.05em;
 }
 
+.navbar__legacy-language {
+  display: none;
+}
+
+.navbar__language-control {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--text-muted);
+  padding: 0.35rem 0.5rem;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+
+.navbar__language-control:hover {
+  color: var(--text-primary);
+  background: var(--bg-surface);
+}
+
+.navbar__language-control select {
+  max-width: 100px;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  font: inherit;
+  cursor: pointer;
+  outline: none;
+}
+
+.navbar__language-control option {
+  color: #0a1628;
+}
+
 .navbar__hamburger {
   display: none;
   color: var(--text-primary);
