@@ -233,13 +233,22 @@ function GoogleTranslate({ language }) {
 }
 
 export function LangProvider({ children }) {
-  const [lang, setLang] = useState(() => localStorage.getItem('lang') || 'es')
+  const [lang] = useState(() => localStorage.getItem('lang') || 'es')
 
   // All source copy remains Spanish and is translated consistently at runtime.
   const t = translations.es
   const setLanguage = (next) => {
-    setLang(next)
+    if (next === lang) return
+
     localStorage.setItem('lang', next)
+    // Google Translate rewrites text nodes in place. Reloading from a clean
+    // React tree prevents a second language change from leaving the UI stuck.
+    if (next === 'es') {
+      document.cookie = 'googtrans=; Max-Age=0; path=/'
+    } else {
+      document.cookie = `googtrans=/es/${next}; path=/; SameSite=Lax`
+    }
+    window.location.reload()
   }
   const toggleLang = () => {
     const next = lang === 'es' ? 'en' : 'es'
