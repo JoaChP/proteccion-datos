@@ -4,6 +4,9 @@ from datetime import datetime, timezone
 import os
 from typing import Any
 import unicodedata
+from urllib.parse import urlencode
+from urllib.request import urlopen
+import json
 
 from fastapi import FastAPI, Query, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -34,11 +37,13 @@ app.add_middleware(
 class ChatMessage(BaseModel):
     message: str = Field(min_length=1, max_length=1_000)
     session_id: str = Field(min_length=1, max_length=128)
+    language: str = Field(default="es", max_length=10)
 
 
 class ChatReply(BaseModel):
     reply: str
     suggestions: list[str]
+    display_suggestions: list[str] | None = None
 
     def __init__(
         self,
@@ -2528,6 +2533,38 @@ RIGHTS = [
 # ENDPOINTS EXISTENTES
 # ============================================================
 
+SUPPORTED_CHAT_LANGUAGES = {"en", "fr", "pt", "de", "it", "ja", "zh-CN"}
+
+
+def translate_chat_text(text: str, target_language: str) -> str:
+    """Translate chatbot output while preserving Spanish as the flow language.
+
+    If the translation provider is unavailable, the educational response is
+    returned in Spanish instead of interrupting the chatbot conversation.
+    """
+    if target_language not in SUPPORTED_CHAT_LANGUAGES or not text:
+        return text
+
+    try:
+        query = urlencode(
+            {
+                "client": "gtx",
+                "sl": "es",
+                "tl": target_language,
+                "dt": "t",
+                "q": text,
+            }
+        )
+        with urlopen(
+            f"https://translate.googleapis.com/translate_a/single?{query}",
+            timeout=5,
+        ) as response:
+            translated = json.loads(response.read().decode("utf-8"))
+        return "".join(piece[0] for piece in translated[0] if piece[0])
+    except (OSError, ValueError, IndexError, TypeError):
+        return text
+
+
 @app.get("/health")
 def health_check() -> dict[str, str]:
     return {"status": "ok"}
@@ -2535,7 +2572,22 @@ def health_check() -> dict[str, str]:
 
 @app.post(f"{API_PREFIX}/chatbot/message", response_model=ChatReply)
 def send_chatbot_message(payload: ChatMessage) -> ChatReply:
-    return answer_message(payload.message, payload.session_id)
+    result = answer_message(payload.message, payload.session_id)
+    language = payload.language
+
+    if language == "es":
+        return result
+
+    # Keep suggestions in Spanish for the rules engine, and return translated
+    # labels separately for the interface.
+    return ChatReply(
+        reply=translate_chat_text(result.reply, language),
+        suggestions=result.suggestions,
+        display_suggestions=[
+            translate_chat_text(suggestion, language)
+            for suggestion in result.suggestions
+        ],
+    )
 
 
 @app.get(f"{API_PREFIX}/chatbot/options")

@@ -27,10 +27,10 @@ export const chatbotService = {
    * Body: { message: string, session_id: string }
    * Returns: { reply: string, suggestions: string[] }
    */
-  sendMessage: (message, sessionId) =>
+  sendMessage: (message, sessionId, language = 'es') =>
     apiFetch('/chatbot/message', {
       method: 'POST',
-      body: JSON.stringify({ message, session_id: sessionId }),
+      body: JSON.stringify({ message, session_id: sessionId, language }),
     }),
 
   /** GET /chatbot/options — initial quick-reply options */

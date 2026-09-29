@@ -5,7 +5,7 @@ import { chatbotService } from '../../services/api'
 import './ChatbotWidget.css'
 
 export default function ChatbotWidget({ standalone = false }) {
-  const { t } = useLang()
+  const { t, lang } = useLang()
 
   const [messages, setMessages] = useState([
     { from: 'bot', text: t.chatbot.greeting, time: '10:30 AM' },
@@ -13,7 +13,9 @@ export default function ChatbotWidget({ standalone = false }) {
 
   const [loading, setLoading] = useState(false)
   const [minimized, setMinimized] = useState(false)
-  const [suggestions, setSuggestions] = useState(() => t.chatbot.options)
+  const [suggestions, setSuggestions] = useState(() =>
+    t.chatbot.options.map((text) => ({ label: text, value: text })),
+  )
 
   const bottomRef = useRef(null)
   const sessionId = useRef(crypto.randomUUID())
@@ -28,7 +30,7 @@ export default function ChatbotWidget({ standalone = false }) {
       minute: '2-digit',
     })
 
-  const sendMessage = async (text) => {
+  const sendMessage = async (text, displayText = text) => {
     const userText = text.trim()
 
     if (!userText || loading) return
@@ -37,7 +39,7 @@ export default function ChatbotWidget({ standalone = false }) {
       ...m,
       {
         from: 'user',
-        text: userText,
+          text: displayText,
         time: now(),
       },
     ])
@@ -46,10 +48,7 @@ export default function ChatbotWidget({ standalone = false }) {
     setLoading(true)
 
     try {
-      const data = await chatbotService.sendMessage(
-        userText,
-        sessionId.current
-      )
+      const data = await chatbotService.sendMessage(userText, sessionId.current, lang)
 
       setMessages(m => [
         ...m,
@@ -60,7 +59,10 @@ export default function ChatbotWidget({ standalone = false }) {
         },
       ])
 
-      setSuggestions(data.suggestions || [])
+      setSuggestions((data.suggestions || []).map((value, index) => ({
+        value,
+        label: data.display_suggestions?.[index] || value,
+      })))
     } catch {
       setMessages(m => [
         ...m,
@@ -177,13 +179,13 @@ export default function ChatbotWidget({ standalone = false }) {
           >
             {suggestions.map((opt, i) => (
               <button
-                key={`${opt}-${i}`}
+                key={`${opt.value || opt}-${i}`}
                 type="button"
                 className="chatbot-option"
-                onClick={() => sendMessage(opt)}
+                onClick={() => sendMessage(opt.value || opt, opt.label || opt)}
                 disabled={loading}
               >
-                <span>{opt}</span>
+                <span>{opt.label || opt}</span>
                 <ChevronRight size={14} />
               </button>
             ))}
