@@ -73,6 +73,16 @@
 .learning-glossary dt { font-weight: 650; margin-bottom: .5rem; }
 .learning-glossary dd { color: var(--text-muted); margin: 0; font-size: .9rem; }
 .learning-source { color: var(--text-secondary); font-size: .8rem; }
+.resources-una { margin-bottom: 3rem; scroll-margin-top: 90px; }
+.resources-una .resources-grid { margin-top: 1.5rem; }
+.resources-una h3 { margin-top: 1rem; }
+.resources-una details { margin-top: 1rem; }
+.resource-bibliography { margin: 3rem 0; scroll-margin-top: 90px; }
+.resource-bibliography .resources-button { margin-top: 1rem; }
+.resources-page .apa-reference { padding-left: 1.5rem; text-indent: -1.5rem; font-size: .85rem; line-height: 1.8; overflow-wrap: anywhere; color: var(--text-primary); }
+.apa-reference a { color: var(--text-secondary); text-decoration: underline; }
+.bibliography-list { padding: 1.5rem; background: var(--bg-secondary); border: 1px solid var(--border-accent); border-radius: 12px; }
+.bibliography-list .apa-reference + .apa-reference { margin-top: 1.2rem; }
 .learning-faq details { padding: .7rem 1.2rem; margin: .7rem 0; border: 1px solid var(--border-accent); border-radius: 10px; background: var(--bg-secondary); }
 @media (max-width: 640px) { .learning-cases, .learning-glossary { grid-template-columns: 1fr; } }
 @media (max-width: 960px) { .resources-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .resources-practice { gap: 1.5rem; padding: 1.5rem; } }

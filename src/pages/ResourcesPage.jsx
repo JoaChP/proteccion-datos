@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { BookOpen, FileText, PlayCircle, ArrowUpRight, Search, Download, ArrowRight } from 'lucide-react'
 import { resources } from '../data/resources'
 import './ResourcesPage.css'
+import ResourceBibliography, { ApaReference } from '../components/sections/ResourceBibliography'
 
 const types = ['Todos', ...new Set(resources.map(resource => resource.type))]
 const normalize = value => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
@@ -31,6 +32,16 @@ export default function ResourcesPage() {
     </header>
 
     <div className="container resources-content">
+      <nav className="learning-nav" aria-label="Navegación de la biblioteca"><a href="#informes-una">Tres informes de Costa Rica</a><a href="#biblioteca">Todos los recursos</a><a href="#referencias-recursos">Referencias APA 7</a></nav>
+      <section id="informes-una" className="resources-una" aria-labelledby="una-heading">
+        <span className="resources-eyebrow">DOCUMENTACIÓN NACIONAL · LABCIBE–UNA</span><h2 id="una-heading">Estado de la ciberseguridad en Costa Rica</h2>
+        <p>Las tres ediciones del informe, con sus autores y años de publicación. Cada enlace abre el documento o su ficha de repositorio en una nueva pestaña.</p>
+        <div className="resources-grid">{['una-2023', 'una-2024', 'una-2025'].map(id => {
+          const item = resources.find(resource => resource.id === id)
+          return <article className="resource-card" key={id}><span className="resources-eyebrow">EDICIÓN {item.reportYear || '2023'} · PUBLICADO EN {item.reference.year}</span><h3>{item.title}</h3><p>{item.description}</p><a href={item.url} target="_blank" rel="noopener noreferrer">Consultar informe {item.reportYear || '2023'} <ArrowUpRight size={18} aria-hidden="true" /><span className="sr-only"> (nueva pestaña)</span></a><details className="resource-alignment"><summary>Referencia APA 7</summary><ApaReference reference={item.reference} /></details></article>
+        })}</div>
+        <p className="resources-note">El informe 2025 se ofrece mediante una copia del documento de la UNA alojada fuera del repositorio institucional. Se verificaron sus créditos y fecha de publicación.</p>
+      </section>
       <section id="biblioteca" aria-labelledby="biblioteca-heading">
         <div className="resources-section-heading"><div><span className="resources-eyebrow">APRENDE A TU RITMO</span><h2 id="biblioteca-heading">Biblioteca de recursos</h2></div><span>{resources.length} recursos · Español e inglés</span></div>
         <p>Selección guiada por las referencias del proyecto: documentos oficiales, investigación académica, tutoriales y contexto periodístico. Cada ficha indica su origen, idioma y utilidad. Los procedimientos legales y canales de atención extranjeros corresponden a sus países de origen.</p>
@@ -52,6 +63,7 @@ export default function ResourcesPage() {
             <p className="resource-meta">{resource.scope}</p><h3>{resource.title}</h3><p>{resource.description}</p>
             {resource.alignment && <details className="resource-alignment"><summary>Relación con la documentación y Costa Rica</summary><p>{resource.alignment}</p><p>{resource.applicability}</p></details>}
             <div className="resource-details"><strong>{resource.source}</strong><span>{resource.format}</span><span>{resource.level}</span></div>
+            <details className="resource-alignment"><summary>Referencia APA 7</summary><ApaReference reference={resource.reference} /></details>
             <a href={resource.url} target="_blank" rel="noopener noreferrer" aria-label={`${action}: ${resource.title} (nueva pestaña)`}>{action} <ArrowUpRight size={18} aria-hidden="true" /></a>
             {resource.local && <a href={resource.url} download="lista-proteccion-digital.html"><Download size={16} aria-hidden="true" /> Descargar ficha HTML</a>}
           </article>
@@ -60,6 +72,7 @@ export default function ResourcesPage() {
         <p className="resources-note">Los enlaces de consulta se abren en una nueva pestaña. Los videos se reproducen en YouTube o en el portal de su autor. El idioma indicado corresponde al material original. Selección revisada el 29 de septiembre de 2026.</p>
       </section>
 
+      <ResourceBibliography />
       <p className="resources-note">Contenido educativo e informativo. Para interpretar la normativa o atender un caso concreto, consulta las fuentes oficiales y la asesoría correspondiente. Las guías externas conservan su autoría original.</p>
     </div>
   </main>

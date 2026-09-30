@@ -1,7 +1,9 @@
 import { additionalResources } from './additionalResources'
+import { referenceDocuments } from './referenceDocuments'
+import { attachReferences } from './resourceReferences'
 
 // Curación editorial: 29 de septiembre de 2026. Mantener las fuentes en su dominio original.
-export const resources = [
+export const resources = attachReferences([
   { id: 'ley', type: 'Documentos', topic: 'Derechos y normativa', title: 'Ley N.º 8968: conoce tus derechos', source: 'Asamblea Legislativa · MICITT', scope: 'Costa Rica', level: 'Para profundizar', format: 'PDF · Español', description: 'Consulta el texto de la ley costarricense. Comienza por los artículos 3, 5 y 7: definiciones, consentimiento informado y derechos de las personas.', url: 'https://www.micitt.go.cr/sites/default/files/marco_juridico_legal/08.%20Ley%20n.%C2%B0%208968%20Ley%20de%20Protecci%C3%B3n%20de%20la%20Persona%20frente%20al%20tratamiento%20de%20sus%20datos%20personales..pdf' },
   { id: 'privacidad', type: 'Documentos', topic: 'Privacidad cotidiana', title: 'Privacidad y seguridad en Internet', source: 'AEPD e INCIBE', scope: 'España · Referencia educativa', level: 'Para empezar', format: 'PDF · Español', description: 'Una guía para revisar hábitos al navegar, usar servicios digitales y compartir información. Las pantallas de aplicaciones pueden haber cambiado desde su publicación.', url: 'https://www.aepd.es/media/guias/guia-privacidad-y-seguridad-en-internet.pdf' },
   { id: 'fraudes', type: 'Documentos', topic: 'Fraudes y phishing', title: 'Guía de fraudes online', source: 'INCIBE', scope: 'España · Referencia educativa', level: 'Para empezar', format: 'PDF · Español', description: 'Reconoce engaños digitales y consulta medidas preventivas. Utiliza los ejemplos para conversar en familia sobre mensajes y ofertas sospechosas.', url: 'https://www.incibe.es/sites/default/files/docs/guia_fraudes/guia-fraudes-online.pdf' },
@@ -10,7 +12,8 @@ export const resources = [
   { id: 'nist', type: 'Documentos', topic: 'Ciberseguridad', title: 'NIST CSF 2.0: guía de recursos y descripción general', source: 'NIST · 2024', scope: 'Estados Unidos · Referencia internacional', level: 'Para profundizar', format: 'PDF · Español', description: 'Introducción a las seis funciones del marco: Gobernar, Identificar, Proteger, Detectar, Responder y Recuperar. Útil para ampliar el análisis de gestión de riesgos del proyecto.', url: 'https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.1299.spa.pdf' },
   { id: 'ficha', type: 'Material del proyecto', topic: 'Privacidad cotidiana', title: 'Mi lista de protección digital', source: 'Protección de Datos CR · Elaboración propia', scope: 'Aplicación cotidiana', level: 'Para empezar', format: 'HTML imprimible · Español', description: 'Una ficha de trabajo para revisar cuentas, permisos y hábitos. Puedes descargarla, imprimirla o guardarla como PDF desde tu navegador.', url: '/recursos/lista-proteccion-digital.html', local: true },
   ...additionalResources,
-]
+  ...referenceDocuments,
+])
 
 export const checklist = [
   'Uso una contraseña larga y diferente en cada cuenta, con ayuda de un gestor de contraseñas.',
