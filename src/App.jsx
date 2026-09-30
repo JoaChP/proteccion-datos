@@ -9,6 +9,7 @@ import PlaceholderPage from './pages/PlaceholderPage'
 import ProtectionDataPage from './pages/ProtectionDataPage'
 import SecurityDigitalPage from './pages/SecurityDigitalPage'
 import AcercaProyecto from './pages/AcercaProyecto'
+import ResourcesPage from './pages/ResourcesPage'
 
 export default function App() {
   return (
@@ -52,9 +53,7 @@ export default function App() {
           <Route
             path="/recursos"
             element={
-              <PlaceholderPage
-                title="Recursos Educativos"
-              />
+              <ResourcesPage />
             }
           />
 
