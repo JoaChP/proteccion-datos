@@ -22,7 +22,7 @@ const translations = {
     },
     sections: {
       exploreTitle: 'Explora nuestros contenidos',
-      exploreSubtitle: 'Todo lo que necesitas saber sobre protección de datos en un solo lugar',
+      exploreSubtitle: 'Educación y orientación ciudadana sobre privacidad, derechos y seguridad digital en Costa Rica.',
       pillarsTitle: 'Nuestros pilares',
       pillarsSubtitle: 'Principios que guían este proyecto educativo',
     },
@@ -37,15 +37,15 @@ const translations = {
       },
       educationalResources: {
         title: 'Recursos Educativos',
-        desc: 'Accede a guías, videos, infografías y materiales para fortalecer tus conocimientos.',
+        desc: 'Consulta documentos, videos, informes de Costa Rica y fuentes con referencias APA 7.',
       },
-      commonRisks: {
-        title: 'Riesgos Comunes',
-        desc: 'Información sobre amenazas digitales y recomendaciones para prevenirlas.',
+      projectChatbot: {
+        title: 'Chatbot de Orientación',
+        desc: 'Explora el asistente educativo sobre privacidad y prevención de riesgos digitales, en desarrollo.',
       },
-      law8968: {
-        title: 'Ley N.° 8968',
-        desc: 'Conoce la Ley de Protección de la Persona frente al Tratamiento de sus Datos Personales.',
+      projectAbout: {
+        title: 'Acerca del Proyecto',
+        desc: 'Conoce los objetivos, el alcance y la propuesta de investigación de esta tesis de la UNA.',
       },
     },
     pillars: {
@@ -108,7 +108,7 @@ const translations = {
     },
     sections: {
       exploreTitle: 'Explore our content',
-      exploreSubtitle: 'Everything you need to know about data protection in one place',
+      exploreSubtitle: 'Citizen education and guidance on privacy, rights and digital security in Costa Rica.',
       pillarsTitle: 'Our pillars',
       pillarsSubtitle: 'Principles that guide this educational project',
     },
@@ -123,15 +123,15 @@ const translations = {
       },
       educationalResources: {
         title: 'Educational Resources',
-        desc: 'Access guides, videos, infographics, and materials to strengthen your knowledge.',
+        desc: 'Browse documents, videos, Costa Rican reports and sources with APA 7 references.',
       },
-      commonRisks: {
-        title: 'Common Risks',
-        desc: 'Information on digital threats and recommendations to prevent them.',
+      projectChatbot: {
+        title: 'Guidance Chatbot',
+        desc: 'Explore the educational assistant on privacy and digital risk prevention, currently in development.',
       },
-      law8968: {
-        title: 'Law No. 8968',
-        desc: 'Learn about the Personal Data Protection Law in Costa Rica.',
+      projectAbout: {
+        title: 'About the Project',
+        desc: 'Learn about the objectives, scope and research proposal of this UNA thesis.',
       },
     },
     pillars: {

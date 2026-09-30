@@ -1,0 +1,56 @@
+"""Learning units derived from the author's theoretical framework and Objective 1."""
+from .chat_sources import LAW, PRIVACY, PRODHAB, CSIRT
+
+NIST = {"title": "National Institute of Standards and Technology. (2024). El Marco de Seguridad Cibernética (CSF) 2.0 del NIST (NIST CSWP 29 spa).", "url": "https://doi.org/10.6028/NIST.CSWP.29.spa"}
+
+def unit(label, title, concept, example, practice, sources):
+    return {"label": label, "title": title, "content": f"CONCEPTO CLAVE\n{concept}\n\nEN LA VIDA COTIDIANA\n{example}\n\nAPLICA LO APRENDIDO\n{practice}", "sources": sources}
+
+EXTENDED_TOPICS = {
+    "cia": unit("Confidencialidad, integridad y disponibilidad", "Tres propiedades de la seguridad", "Confidencialidad: acceso solo para quien está autorizado. Integridad: información correcta y sin modificaciones indebidas. Disponibilidad: poder acceder cuando se necesita. Son propiedades complementarias; proteger una no garantiza las otras.", "Un expediente expuesto afecta la confidencialidad; una nota alterada, la integridad; un servicio inaccesible, la disponibilidad.", "Piensa qué información necesitas proteger, quién puede acceder y cómo recuperarla si se pierde. Combina controles de acceso, revisión de cambios y copias de seguridad.", [NIST]),
+    "risk": unit("Amenaza, vulnerabilidad y riesgo", "Reconocer el riesgo antes de actuar", "Una amenaza puede causar daño; una vulnerabilidad es una debilidad que puede aprovecharse; el riesgo considera la posibilidad y las consecuencias. Una señal de alerta orienta una revisión, pero no demuestra por sí sola que hubo un ataque.", "Un mensaje fraudulento es una amenaza. Reutilizar una contraseña crea una debilidad. Perder el acceso al correo y a cuentas vinculadas es una posible consecuencia.", "Identifica qué está en juego, qué señales observaste y qué medida reduce la exposición. Verifica por un canal independiente antes de compartir información.", [NIST, PRIVACY]),
+    "lifecycle": unit("Ciclo de vida de tus datos", "Desde la recopilación hasta la eliminación", "Los datos se recopilan, utilizan, almacenan, comparten y finalmente se eliminan o conservan cuando procede. En cada etapa importan la finalidad, el acceso y la seguridad. Recopilar más datos no siempre mejora un servicio.", "Una tienda necesita ciertos datos para entregar una compra. Usarlos posteriormente para otra finalidad exige revisar el fundamento y las condiciones del tratamiento.", "Consulta quién solicita los datos, para qué, con quién se comparten y cómo ejercer tus derechos. Conserva las solicitudes y respuestas sin publicar información de otras personas.", [LAW, PRODHAB]),
+    "resilience": unit("Prevención, respuesta y recuperación", "Prepararte también es protegerte", "La ciberseguridad es un proceso continuo. NIST CSF 2.0 organiza seis funciones: Gobernar, Identificar, Proteger, Detectar, Responder y Recuperar. Son un marco de gestión; aquí se usan como referencia educativa para organizar hábitos.", "Antes de un incidente: proteger cuentas y respaldar. Durante: detener la interacción sospechosa y verificar. Después: recuperar el acceso y revisar lo ocurrido.", "Define qué cuentas son esenciales, activa medidas de protección, revisa alertas y conserva medios de recuperación. Si hay movimientos bancarios no reconocidos, contacta al banco por un canal oficial.", [NIST, PRIVACY]),
+    "institutions": unit("Instituciones y apoyo en Costa Rica", "Elegir el canal adecuado", "PRODHAB atiende asuntos de tratamiento de datos personales. El OIJ es una vía para posibles delitos. CSIRT-CR atiende incidentes dentro de su comunidad institucional. Son competencias distintas y pueden coexistir en una situación.", "Una solicitud sobre datos mantenidos por una empresa y una transacción fraudulenta pueden necesitar gestiones diferentes.", "Conserva evidencia, identifica la entidad involucrada y consulta requisitos en los portales oficiales. Este asistente no presenta denuncias ni confirma que ocurrió un delito.", [PRODHAB, CSIRT]),
+    "international": unit("Aprender de referentes internacionales", "Comparar para mejorar en Costa Rica", "El marco teórico compara enfoques normativos, técnicos, institucionales y educativos. Los marcos internacionales ayudan a organizar controles y aprendizaje; su aplicación jurídica depende del país y del contexto.", "Una guía española puede explicar privacidad de cuentas. Sus servicios de atención y procedimientos no se trasladan automáticamente a Costa Rica.", "Distingue tres preguntas: ¿qué práctica puedo adaptar?, ¿qué fuente la respalda?, ¿qué institución es competente en Costa Rica? Revisa el año y el alcance de cada informe.", [NIST, LAW, PRIVACY]),
+}
+
+# Correct answers are deliberately distributed across A, B and C.
+def check(question, answers, correct, explanation):
+    return {"question": question, "options": [f"{letter}) {text}" for letter, text in zip('ABC', answers)], "correct": correct, "explanation": explanation}
+
+LEARNING_CHECKS = {
+    "phishing": check("Un mensaje usa el logotipo de tu banco y pide un código. ¿Cómo verificas?", ["Respondo al remitente", "Accedo a la aplicación oficial por mi cuenta", "Confío en el logotipo"], "B", "El aspecto visual puede imitarse. Un canal oficial independiente permite verificar sin seguir el enlace recibido."),
+    "passwords": check("¿Qué reduce el efecto de una contraseña expuesta?", ["Una contraseña única por cuenta", "Usar pequeñas variaciones", "Compartirla solo con conocidos"], "A", "Las credenciales únicas limitan el acceso a otras cuentas cuando una contraseña se expone."),
+    "2fa": check("Te llaman para pedir el código de autenticación que acabas de recibir. ¿Qué haces?", ["Lo comparto si conocen mi nombre", "Lo envío si llaman varias veces", "No lo comparto y verifico por mi cuenta"], "C", "Un código puede autorizar el acceso. Conocer tu nombre no prueba la identidad de quien llama."),
+    "identity": check("Una oferta pide fotos de tu tarjeta antes de verificar a la empresa. ¿Qué priorizas?", ["Enviar imágenes de menor calidad", "Detener el envío y verificar por un canal oficial", "Confiar en el número de seguidores"], "B", "La información solicitada es de alto impacto. La apariencia del perfil no sustituye la verificación independiente."),
+    "malware": check("Una aplicación desconocida pide desactivar la protección del equipo. ¿Qué decides?", ["Detener la instalación y revisar el origen", "Desactivarla por unos minutos", "Instalarla si es gratuita"], "A", "La solicitud de reducir la protección es una señal para detenerse y verificar, no una prueba de legitimidad."),
+    "privacy": check("¿Un perfil privado elimina el riesgo de publicar tu documento?", ["Sí, siempre", "Sí, si tengo pocos contactos", "No: alguien puede copiar o compartirlo"], "C", "Limitar la audiencia reduce exposición, pero no controla todas las copias ni los usos posteriores."),
+    "internet": check("Un sitio tiene HTTPS. ¿Qué puedes concluir?", ["Es una empresa legítima", "La conexión está cifrada, pero debo verificar el dominio", "No puede ser fraudulento"], "B", "El cifrado de la conexión no certifica la legitimidad de la entidad ni la finalidad de la solicitud."),
+    "personal_data": check("¿Puede identificarte una combinación de información?", ["Sí, aunque cada dato aislado parezca insuficiente", "No, solo el nombre completo", "No, si no aparece mi cédula"], "A", "La identificación puede resultar de combinar datos. Conviene revisar el conjunto de información que compartes."),
+    "law": check("¿Cuál es el mejor primer paso para conocer el tratamiento de tus datos?", ["Publicarlos para preguntar", "Enviar contraseñas como identificación", "Solicitar información a la entidad y conservar la gestión"], "C", "Conocer quién trata tus datos y con qué finalidad ayuda a ejercer tus derechos. Los requisitos se consultan en las fuentes oficiales."),
+    "cia": check("Una persona cambia una nota académica sin autorización. ¿Qué propiedad se afecta directamente?", ["Disponibilidad", "Integridad", "Solo confidencialidad"], "B", "La integridad se refiere a mantener la exactitud de la información frente a modificaciones indebidas."),
+    "risk": check("¿Reutilizar una contraseña es una amenaza o una debilidad?", ["Una vulnerabilidad que puede aumentar el riesgo", "Una prueba de que hubo un ataque", "Una medida de recuperación"], "A", "La debilidad facilita consecuencias si se aprovecha. Identificarla no demuestra que ya ocurrió un incidente."),
+    "lifecycle": check("Una entidad ya tiene tus datos. ¿Puede usarlos para cualquier propósito?", ["Sí, porque los entregué", "Sí, si el sistema es seguro", "Debe revisar la finalidad y el fundamento del tratamiento"], "C", "La seguridad técnica y el tratamiento legítimo son dimensiones relacionadas, pero distintas."),
+    "resilience": check("¿Para qué sirven las copias de seguridad?", ["Para eliminar todo ataque", "Para apoyar la recuperación si pierdo información", "Para reemplazar la autenticación"], "B", "Los respaldos contribuyen a recuperar información. No sustituyen otras medidas preventivas."),
+    "institutions": check("¿Todos los incidentes se atienden en la misma institución?", ["No; depende del tratamiento de datos, posible delito o alcance institucional", "Sí, siempre CSIRT-CR", "Sí, siempre PRODHAB"], "A", "La competencia y el tipo de gestión deben verificarse según la naturaleza de la situación."),
+    "international": check("Una guía extranjera recomienda un teléfono de ayuda. ¿Qué haces en Costa Rica?", ["Asumo que funciona en todo país", "Lo presento como contacto nacional", "Aprovecho la práctica y verifico el canal costarricense"], "C", "Una referencia educativa internacional no determina los canales ni el procedimiento jurídico nacional."),
+}
+
+AREA_ACTIONS = {
+    "Contraseñas": ("Usa credenciales únicas y activa autenticación multifactor en las cuentas importantes.", "/seguridad-digital#principios"),
+    "Navegación": ("Verifica el dominio y el canal, actualiza el equipo y revisa permisos antes de compartir información.", "/seguridad-digital#amenazas"),
+    "Redes sociales": ("Reduce datos publicados, revisa la audiencia y elimina accesos de aplicaciones innecesarias.", "/proteccion-datos#vida-cotidiana"),
+    "Compras en línea": ("Verifica al comercio por canales independientes y conserva comprobantes de las transacciones.", "/proteccion-datos#buenas-practicas"),
+    "Derechos digitales": ("Identifica al responsable de tus datos y consulta los canales oficiales para ejercer tus derechos.", "/proteccion-datos#derechos"),
+}
+
+def assessment_report(questions, answers):
+    areas = []
+    for name, (action, url) in AREA_ACTIONS.items():
+        selected = [answer for question, answer in zip(questions, answers) if question[0] == name]
+        score = sum({'A': 0, 'B': 1, 'C': 2}[answer] for answer in selected)
+        percentage = round(score / (2 * len(selected)) * 100)
+        level = 'Bajo' if percentage <= 33 else 'Moderado' if percentage <= 66 else 'Alto'
+        areas.append({"area": name, "percentage": percentage, "level": level, "action": action if score else "Mantén estas prácticas y revísalas periódicamente.", "url": url})
+    return sorted(areas, key=lambda area: area['percentage'], reverse=True)

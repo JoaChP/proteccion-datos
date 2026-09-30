@@ -3,6 +3,7 @@ import { BookOpen, FileText, PlayCircle, ArrowUpRight, Search, Download, ArrowRi
 import { resources } from '../data/resources'
 import './ResourcesPage.css'
 import ResourceBibliography, { ApaReference } from '../components/sections/ResourceBibliography'
+import ResourceSidebar from '../components/layout/ResourceSidebar'
 
 const types = ['Todos', ...new Set(resources.map(resource => resource.type))]
 const normalize = value => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
@@ -21,6 +22,8 @@ export default function ResourcesPage() {
   const reset = () => { setQuery(''); setType('Todos'); setTopic('Todos los temas'); setLanguage('Todos los idiomas') }
 
   return <main id="main-content" className="resources-page">
+    <ResourceSidebar />
+    <div className="resources-main">
     <header className="resources-hero">
       <div className="container">
         <span className="resources-eyebrow"><BookOpen size={17} aria-hidden="true" /> BIBLIOTECA PARA LA CIUDADANÍA</span>
@@ -32,7 +35,6 @@ export default function ResourcesPage() {
     </header>
 
     <div className="container resources-content">
-      <nav className="learning-nav" aria-label="Navegación de la biblioteca"><a href="#informes-una">Tres informes de Costa Rica</a><a href="#biblioteca">Todos los recursos</a><a href="#referencias-recursos">Referencias APA 7</a></nav>
       <section id="informes-una" className="resources-una" aria-labelledby="una-heading">
         <span className="resources-eyebrow">DOCUMENTACIÓN NACIONAL · LABCIBE–UNA</span><h2 id="una-heading">Estado de la ciberseguridad en Costa Rica</h2>
         <p>Las tres ediciones del informe, con sus autores y años de publicación. Cada enlace abre el documento o su ficha de repositorio en una nueva pestaña.</p>
@@ -54,7 +56,7 @@ export default function ResourcesPage() {
         <div className="resources-filters" role="group" aria-label="Filtrar por formato">{types.map(item => <button key={item} type="button" aria-pressed={type === item} onClick={() => setType(item)}>{item}</button>)}</div>
         <button className="resources-reset" onClick={reset}>Mostrar toda la biblioteca</button>
         {type === 'Videos' && <aside className="resources-reading-guide" aria-label="Videos y contexto costarricense"><h3>Cómo se relacionan con este proyecto</h3><p>El reportaje de Conti es una referencia costarricense citada en el TFG. Los tutoriales de AEPD y el video de INCIBE son complementos españoles para los temas de prevención y privacidad del capítulo VI. Sus instituciones, servicios de ayuda y procedimientos corresponden a España.</p><p>Para el marco costarricense, consulta la Ley N.º 8968 y la PRODHAB en esta biblioteca. Estos videos no constituyen una explicación de esa ley.</p></aside>}
-        <p className="resources-count" role="status">{filtered.length} {filtered.length === 1 ? 'recurso disponible' : 'recursos disponibles'}</p>
+        <p className="resources-count" role="status"><span key={filtered.length}>{filtered.length} {filtered.length === 1 ? 'recurso disponible' : 'recursos disponibles'}</span></p>
         <div className="resources-grid">{filtered.map(resource => {
           const Icon = resource.type === 'Videos' ? PlayCircle : resource.type === 'Documentos' ? FileText : BookOpen
           const action = resource.action || (resource.local ? 'Abrir ficha' : resource.type === 'Videos' ? 'Ver colección de videos' : 'Consultar recurso')
@@ -74,6 +76,7 @@ export default function ResourcesPage() {
 
       <ResourceBibliography />
       <p className="resources-note">Contenido educativo e informativo. Para interpretar la normativa o atender un caso concreto, consulta las fuentes oficiales y la asesoría correspondiente. Las guías externas conservan su autoría original.</p>
+    </div>
     </div>
   </main>
 }

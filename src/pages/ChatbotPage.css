@@ -1,35 +1,6 @@
-.chatbot-page {
-  min-height: 100vh;
-  padding-top: 100px;
-  padding-bottom: 3rem;
-}
-
-.chatbot-page__inner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2rem;
-}
-
-.chatbot-page__header {
-  text-align: center;
-  max-width: 500px;
-}
-
-.chatbot-page__title {
-  font-size: var(--text-3xl);
-  font-weight: 800;
-  color: var(--text-primary);
-  margin-bottom: 0.75rem;
-}
-
-.chatbot-page__sub {
-  color: var(--text-muted);
-  font-size: var(--text-base);
-  line-height: 1.6;
-}
-
-.chatbot-page__widget {
-  width: 100%;
-  max-width: 680px;
-}
+.chatbot-page { width: min(1280px, 100%); margin: 0 auto; height: 100dvh; padding: 88px 24px 16px; }
+/* The hidden translation banner must not offset the full-height conversation. */
+body:has(.chatbot-page) { top: 0 !important; overflow: hidden; }
+body:has(.chatbot-page) footer { display: none; }
+.chatbot-page .chatbot-widget--standalone { width: 100%; max-width: none; height: 100%; max-height: none; }
+@media (max-width: 640px) { .chatbot-page { padding: 76px 8px 8px; } }

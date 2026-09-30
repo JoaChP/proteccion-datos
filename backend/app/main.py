@@ -11,6 +11,8 @@ import json
 from fastapi import FastAPI, Query, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
+from .chat_sources import supporting_sources
+from .learning_content import EXTENDED_TOPICS, LEARNING_CHECKS, assessment_report
 
 API_PREFIX = "/api/v1"
 DEFAULT_ORIGINS = (
@@ -44,6 +46,9 @@ class ChatReply(BaseModel):
     reply: str
     suggestions: list[str]
     display_suggestions: list[str] | None = None
+    sources: list[dict[str, str]] = Field(default_factory=list)
+    progress: dict[str, int] | None = None
+    areas: list[dict[str, Any]] = Field(default_factory=list)
 
     def __init__(
         self,
@@ -70,9 +75,8 @@ class AnalyticsEvent(BaseModel):
 
 ROOT_OPTIONS = [
     "Orientación ante una situación",
-    "Simulación educativa",
+    "Educación y simulación",
     "Evaluar mis prácticas digitales",
-    "Mis derechos y denuncias",
 ]
 
 
@@ -1022,6 +1026,7 @@ EDUCATION_TOPICS = {
 
 }
 
+EDUCATION_TOPICS.update(EXTENDED_TOPICS)
 EDUCATION_OPTIONS = [item["label"] for item in EDUCATION_TOPICS.values()]
 
 
@@ -1636,6 +1641,8 @@ ASSESSMENT = [
     ),
 
 ]
+# Five assessment areas defined in the initial knowledge base.
+ASSESSMENT = [question for question in ASSESSMENT if question[0] != "Incidentes digitales"]
 SESSIONS: dict[str, dict[str, Any]] = {}
 
 
@@ -1648,7 +1655,7 @@ def normalize(value: str) -> str:
     return "".join(
         char
         for char in unicodedata.normalize("NFD", value.lower())
-        if unicodedata.category(char) != "Mn"
+        if unicodedata.category(char) not in {"Mn", "So"}
     ).strip()
 
 
@@ -1702,6 +1709,7 @@ def assessment_question(session_id: str) -> ChatReply:
             "Selecciona la opción que más se parezca a tu práctica habitual."
         ),
         [f"A) {a}", f"B) {b}", f"C) {c}"],
+        progress={"current": index + 1, "total": len(ASSESSMENT)},
     )
 
 
@@ -1713,7 +1721,7 @@ def guidance_menu_reply() -> ChatReply:
             "No compartas contraseñas, PIN, códigos de autenticación, "
             "números completos de tarjeta ni otra información confidencial."
         ),
-        [item["label"] for item in GUIDANCE.values()],
+        [item["label"] for item in GUIDANCE.values()] + ["Mis derechos y denuncias", "🏠 Volver al inicio"],
     )
 
 
@@ -1725,7 +1733,7 @@ def education_menu_reply() -> ChatReply:
             "medidas preventivas y, cuando corresponda, una actividad para "
             "comprobar lo aprendido."
         ),
-        EDUCATION_OPTIONS,
+        EDUCATION_OPTIONS + ["🎯 Hacer una simulación", "🏠 Volver al inicio"],
     )
 
 
@@ -1737,7 +1745,7 @@ def simulation_menu_reply() -> ChatReply:
             "Después recibirás retroalimentación explicando por qué la "
             "decisión representa una buena práctica o un riesgo."
         ),
-        SIMULATION_OPTIONS,
+        SIMULATION_OPTIONS + ["🎓 Quiero aprender", "🏠 Volver al inicio"],
     )
 
 
@@ -1932,11 +1940,48 @@ def answer_message(message: str, session_id: str) -> ChatReply:
         "volver al menu",
         "volver al menú",
         "🏠 volver al inicio",
+        "volver al inicio",
     }:
         SESSIONS.pop(session_id, None)
         return root_reply()
 
+    # Navigation actions must precede state-specific answers, so a menu can
+    # never swallow a button that switches to another module.
+    if text == normalize("Orientación ante una situación"):
+        SESSIONS[session_id] = {"mode": "guidance-menu"}
+        return guidance_menu_reply()
+    if text in {normalize("Educación y simulación"), normalize("Quiero aprender"), normalize("Elegir otro tema")}:
+        SESSIONS[session_id] = {"mode": "education-menu"}
+        return education_menu_reply()
+    if text in {normalize("Simulación educativa"), normalize("Hacer una simulación")}:
+        SESSIONS[session_id] = {"mode": "simulation-menu"}
+        return simulation_menu_reply()
+    if text == normalize("Mis derechos y denuncias") or text == normalize("Volver a derechos"):
+        SESSIONS.pop(session_id, None)
+        return rights_menu_reply()
+    if text == normalize("Evaluar mis prácticas digitales"):
+        SESSIONS[session_id] = {"mode": "assessment", "index": 0, "score": 0, "answers": []}
+        return ChatReply("Revisa tus hábitos en cinco áreas: contraseñas, navegación, privacidad, compras y derechos. Selecciona una respuesta por pregunta. El resultado es orientativo y se basa únicamente en tus elecciones.", ["▶️ Iniciar evaluación", "🏠 Volver al inicio"])
+    if text == normalize("Iniciar evaluación"):
+        SESSIONS[session_id] = {"mode": "assessment", "index": 0, "score": 0, "answers": []}
+        return assessment_question(session_id)
+
     state = SESSIONS.get(session_id)
+
+    if state and state['mode'] == 'learning-content' and text == normalize('Comprobar lo aprendido'):
+        quiz = LEARNING_CHECKS[state['topic']]
+        state['mode'] = 'learning-check'
+        return ChatReply(f"COMPRUEBA LO APRENDIDO\n\n{quiz['question']}", quiz['options'])
+    if state and state['mode'] == 'learning-check':
+        quiz = LEARNING_CHECKS[state['topic']]
+        index = find_option_index(message, quiz['options'])
+        if index is None:
+            return ChatReply('Selecciona una de las alternativas para recibir retroalimentación.', quiz['options'])
+        choice = 'ABC'[index]
+        title = 'BUENA DECISIÓN' if choice == quiz['correct'] else 'OPORTUNIDAD PARA APRENDER'
+        topic = EDUCATION_TOPICS[state['topic']]
+        SESSIONS.pop(session_id, None)
+        return ChatReply(f"{title}\n\n{quiz['explanation']}\n\nSIGUIENTE PASO\nAplica este criterio en una simulación o continúa con otro tema.", ['🎯 Hacer una simulación', '📚 Elegir otro tema', '🏠 Volver al inicio'], sources=topic.get('sources', []))
 
     # --------------------------------------------------------
     # MENÚ DE ORIENTACIÓN
@@ -2020,8 +2065,10 @@ def answer_message(message: str, session_id: str) -> ChatReply:
 
         topic_key = topic_keys[selected]
         topic = EDUCATION_TOPICS[topic_key]
+        state.update({'mode': 'learning-content', 'topic': topic_key})
 
         suggestions = [
+            'Comprobar lo aprendido',
             "🎯 Hacer una simulación",
             "📚 Elegir otro tema",
             "🏠 Volver al inicio",
@@ -2030,6 +2077,7 @@ def answer_message(message: str, session_id: str) -> ChatReply:
         return ChatReply(
             f"{topic['title']}\n\n{topic['content']}",
             suggestions,
+            sources=topic.get('sources', []),
         )
 
     # --------------------------------------------------------
@@ -2167,7 +2215,7 @@ def answer_message(message: str, session_id: str) -> ChatReply:
         # ----------------------------------------------------
         # NIVEL DE RIESGO
         # ----------------------------------------------------
-        if percentage <= 20:
+        if percentage <= 33:
             level = "🟢 BAJO"
 
             explanation = (
@@ -2180,7 +2228,7 @@ def answer_message(message: str, session_id: str) -> ChatReply:
                 "las buenas prácticas de manera constante."
             )
 
-        elif percentage <= 40:
+        elif percentage <= 66:
             level = "🟡 MODERADO"
 
             explanation = (
@@ -2191,96 +2239,18 @@ def answer_message(message: str, session_id: str) -> ChatReply:
                 "seleccionaste respuestas intermedias o de mayor riesgo."
             )
 
-        elif percentage <= 60:
-            level = "🟠 ALTO"
-
-            explanation = (
-                "Tus respuestas muestran varias prácticas que pueden "
-                "incrementar de forma importante tu exposición a riesgos "
-                "digitales.\n\n"
-                "Es recomendable establecer cambios preventivos en áreas "
-                "como contraseñas, autenticación, navegación, privacidad, "
-                "manejo de información personal y respuesta ante incidentes."
-            )
-
         else:
-            level = "🔴 CRÍTICO"
-
+            level = "🔴 ALTO"
             explanation = (
-                "Tus respuestas muestran un nivel elevado de exposición "
-                "a diferentes riesgos digitales.\n\n"
-                "Se recomienda priorizar cambios de seguridad y revisar "
-                "especialmente las prácticas relacionadas con credenciales, "
-                "autenticación, información personal, enlaces, aplicaciones "
-                "y respuesta ante posibles incidentes."
+                "Tus respuestas muestran prácticas que pueden aumentar tu exposición a riesgos digitales. "
+                "Prioriza las mejoras en contraseñas, autenticación, privacidad, navegación y compras."
             )
 
         # ----------------------------------------------------
-        # RECOMENDACIONES PERSONALIZADAS
+        # RECOMENDACIONES PERSONALIZADAS POR ÁREA
         # ----------------------------------------------------
-        recommendations = []
-
-        if high_risk_answers > 0:
-            recommendations.append(
-                "Revisa las preguntas donde seleccionaste la opción C "
-                "y convierte esas prácticas en prioridades de mejora."
-            )
-
-        if medium_risk_answers >= 3:
-            recommendations.append(
-                "Trabaja las prácticas intermedias para convertirlas "
-                "en hábitos preventivos permanentes."
-            )
-
-        if score >= 10:
-            recommendations.append(
-                "Utiliza contraseñas únicas y robustas para cada cuenta "
-                "importante."
-            )
-
-        if score >= 15:
-            recommendations.append(
-                "Activa autenticación de dos factores en tus cuentas "
-                "importantes."
-            )
-
-        if score >= 20:
-            recommendations.append(
-                "Verifica siempre los enlaces, dominios y sitios antes "
-                "de introducir información personal."
-            )
-
-        if score >= 25:
-            recommendations.append(
-                "Reduce la publicación de información personal, documentos "
-                "e identificadores en redes sociales."
-            )
-
-        if score >= 30:
-            recommendations.append(
-                "Revisa periódicamente los permisos de aplicaciones y "
-                "los servicios conectados a tus cuentas."
-            )
-
-        if score >= 35:
-            recommendations.append(
-                "Mantén actualizado el sistema operativo, navegador y "
-                "aplicaciones que utilizas."
-            )
-
-        if score >= 40:
-            recommendations.append(
-                "Establece un procedimiento personal para responder ante "
-                "phishing, accesos no autorizados y exposición de datos."
-            )
-
-        if not recommendations:
-            recommendations = [
-                "Mantén contraseñas únicas y robustas.",
-                "Conserva activada la autenticación de dos factores.",
-                "Continúa verificando enlaces, dominios y permisos.",
-                "Revisa periódicamente la configuración de privacidad.",
-            ]
+        areas = assessment_report(ASSESSMENT, answers)
+        recommendations = [f"{area['area']}: {area['action']}" for area in areas]
 
         recommendations_text = "\n".join(
             f"{index}. {item}"
@@ -2336,6 +2306,7 @@ def answer_message(message: str, session_id: str) -> ChatReply:
                 "🆘 Orientación ante una situación",
                 "🏠 Volver al inicio",
             ],
+            areas=areas,
         )
 
     # --------------------------------------------------------
@@ -2573,6 +2544,7 @@ def health_check() -> dict[str, str]:
 @app.post(f"{API_PREFIX}/chatbot/message", response_model=ChatReply)
 def send_chatbot_message(payload: ChatMessage) -> ChatReply:
     result = answer_message(payload.message, payload.session_id)
+    result.sources = list({source["url"]: source for source in result.sources + supporting_sources(result.reply)}.values())
     language = payload.language
 
     if language == "es":
@@ -2587,6 +2559,9 @@ def send_chatbot_message(payload: ChatMessage) -> ChatReply:
             translate_chat_text(suggestion, language)
             for suggestion in result.suggestions
         ],
+        sources=result.sources,
+        progress=result.progress,
+        areas=result.areas,
     )
 
 

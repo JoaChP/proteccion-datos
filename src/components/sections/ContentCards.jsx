@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { ShieldCheck, Wifi, BookOpen, AlertTriangle, Scale, ArrowRight } from 'lucide-react'
+import { ShieldCheck, Wifi, BookOpen, MessageCircle, GraduationCap, ArrowRight } from 'lucide-react'
 import { useLang } from '../../hooks/useLang'
 import './ContentCards.css'
 
@@ -26,18 +26,18 @@ const cardConfig = [
     href: '/recursos',
   },
   {
-    key: 'commonRisks',
-    icon: AlertTriangle,
+    key: 'projectChatbot',
+    icon: MessageCircle,
     color: '#f59e0b',
     bg: 'rgba(245,158,11,0.1)',
-    href: '/riesgos',
+    href: '/chatbot',
   },
   {
-    key: 'law8968',
-    icon: Scale,
+    key: 'projectAbout',
+    icon: GraduationCap,
     color: '#ec4899',
     bg: 'rgba(236,72,153,0.1)',
-    href: '/ley-8968',
+    href: '/acerca',
   },
 ]
 
@@ -65,7 +65,7 @@ export default function ContentCards() {
                 <div className="card__icon-wrap" style={{ background: bg, color }}>
                   <Icon size={28} strokeWidth={1.8} />
                 </div>
-                <h3 className="card__title" style={{ color }}>
+                <h3 className="card__title">
                   {card.title}
                 </h3>
                 <p className="card__desc">{card.desc}</p>
