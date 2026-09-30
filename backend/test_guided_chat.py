@@ -43,6 +43,37 @@ class GuidedChatTests(unittest.TestCase):
     def setUp(self):
         SESSIONS.clear()
 
+    def test_serverless_simulation_survives_each_cold_start(self):
+        history = []
+        def send(message):
+            SESSIONS.clear()
+            result = send_chatbot_message(ChatMessage(message=message, session_id='same-client', history=history.copy()))
+            history.append(message)
+            self.assertEqual(SESSIONS, {})
+            return result
+        send('🎯 Hacer una simulación')
+        result = send(next(iter(SIMULATIONS.values()))['label'])
+        for index in range(4):
+            self.assertEqual(result.simulation['current'], index + 1)
+            result = send(result.suggestions[0])
+            self.assertIsInstance(result.feedback['correct'], bool)
+            result = send(result.suggestions[0])
+        self.assertEqual(result.simulation['phase'], 'complete')
+
+    def test_serverless_assessment_survives_each_cold_start(self):
+        history = ['Evaluar mis prácticas digitales']
+        result = send_chatbot_message(ChatMessage(message='▶️ Iniciar evaluación', session_id='cold', history=history.copy()))
+        history.append('▶️ Iniciar evaluación')
+        for index in range(len(ASSESSMENT)):
+            SESSIONS.clear()
+            self.assertEqual(result.progress['current'], index + 1)
+            choice = result.suggestions[0]
+            result = send_chatbot_message(ChatMessage(message=choice, session_id='cold', history=history.copy()))
+            history.append(choice)
+        self.assertEqual(len(result.areas), 5)
+        self.assertIn('BAJO', result.reply)
+        self.assertEqual(SESSIONS, {})
+
     def test_every_guidance_branch_has_a_result_and_exit(self):
         for topic in GUIDANCE.values():
             for choice in topic['options']:

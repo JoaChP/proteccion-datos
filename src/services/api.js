@@ -6,7 +6,7 @@
  * fetch calls when the backend is ready.
  */
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1'
+const BASE_URL = import.meta.env.PROD ? '/api/v1' : (import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1')
 
 // Generic fetch wrapper
 async function apiFetch(endpoint, options = {}) {
@@ -27,10 +27,10 @@ export const chatbotService = {
    * Body: { message: string, session_id: string }
    * Returns: { reply: string, suggestions: string[] }
    */
-  sendMessage: (message, sessionId, language = 'es') =>
+  sendMessage: (message, sessionId, language = 'es', history = []) =>
     apiFetch('/chatbot/message', {
       method: 'POST',
-      body: JSON.stringify({ message, session_id: sessionId, language }),
+      body: JSON.stringify({ message, session_id: sessionId, language, history }),
     }),
 
   /** GET /chatbot/options — initial quick-reply options */

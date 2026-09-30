@@ -2,7 +2,8 @@
 
 from datetime import datetime, timezone
 import os
-from typing import Any
+from typing import Any, Annotated
+from uuid import uuid4
 import unicodedata
 from urllib.parse import urlencode
 from urllib.request import urlopen
@@ -40,6 +41,7 @@ class ChatMessage(BaseModel):
     message: str = Field(min_length=1, max_length=1_000)
     session_id: str = Field(min_length=1, max_length=128)
     language: str = Field(default="es", max_length=10)
+    history: list[Annotated[str, Field(min_length=1, max_length=1_000)]] | None = Field(default=None, max_length=100)
 
 
 class ChatReply(BaseModel):
@@ -2196,7 +2198,18 @@ def health_check() -> dict[str, str]:
 
 @app.post(f"{API_PREFIX}/chatbot/message", response_model=ChatReply)
 def send_chatbot_message(payload: ChatMessage) -> ChatReply:
-    result = answer_message(payload.message, payload.session_id)
+    if payload.history is None:
+        result = answer_message(payload.message, payload.session_id)
+    else:
+        # Reconstruct only the guided choices, without depending on one warm
+        # serverless instance. A private ID keeps concurrent requests isolated.
+        request_id = str(uuid4())
+        try:
+            for choice in payload.history:
+                answer_message(choice, request_id)
+            result = answer_message(payload.message, request_id)
+        finally:
+            SESSIONS.pop(request_id, None)
     result.sources = list({source["url"]: source for source in result.sources + supporting_sources(result.reply)}.values())
     language = payload.language
 

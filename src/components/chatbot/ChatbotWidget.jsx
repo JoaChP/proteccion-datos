@@ -27,6 +27,7 @@ export default function ChatbotWidget({ standalone = false }) {
   const scrollRef = useRef(null)
   const pending = useRef(false)
   const sessionId = useRef(crypto.randomUUID())
+  const history = useRef([])
   useEffect(() => {
     const panel = scrollRef.current
     if (!panel) return
@@ -53,7 +54,10 @@ export default function ChatbotWidget({ standalone = false }) {
     setFeedback(null)
     setLoading(true)
     try {
-      const data = await chatbotService.sendMessage(value, sessionId.current, lang)
+      const startsRoute = starters.some(item => value.includes(item.value)) || /Hacer una simulación|Simulación educativa|Quiero aprender|Elegir otro tema|Volver al inicio/.test(value)
+      const previousChoices = startsRoute ? [] : history.current
+      const data = await chatbotService.sendMessage(value, sessionId.current, lang, previousChoices)
+      history.current = [...previousChoices, value]
       setProgress(data.progress || null)
       setSimulation(data.simulation || null)
       setFeedback(data.feedback || null)
@@ -78,6 +82,7 @@ export default function ChatbotWidget({ standalone = false }) {
       </div>
       {messages.length > 0 && <button className="chatbot-home" disabled={loading} onClick={() => {
         sessionId.current = crypto.randomUUID()
+        history.current = []
         setMessages([]); setSuggestions([]); setProgress(null); setSimulation(null); setFeedback(null); setRoute(null)
       }}><Home size={18} aria-hidden="true" /> Volver al inicio</button>}
       {!standalone && <button className="chatbot-widget__min-btn" onClick={() => setMinimized(value => !value)} aria-label={minimized ? 'Expandir chatbot' : 'Minimizar chatbot'} aria-expanded={!minimized}><Minimize2 size={20} /></button>}
