@@ -1,7 +1,8 @@
 import unittest
+from itertools import product
 from unittest.mock import patch
 from app.main import (answer_message, send_chatbot_message, ChatMessage, GUIDANCE,
-                      SIMULATIONS, EDUCATION_OPTIONS, EDUCATION_TOPICS, ASSESSMENT, SESSIONS)
+                      SIMULATIONS, EDUCATION_OPTIONS, EDUCATION_TOPICS, ASSESSMENT, SESSIONS, LEARNING_GROUPS)
 from app.learning_content import LEARNING_CHECKS, assessment_report
 
 class GuidedChatTests(unittest.TestCase):
@@ -15,6 +16,10 @@ class GuidedChatTests(unittest.TestCase):
                 question = answer_message('Comprobar lo aprendido', 'test')
                 result = answer_message(question.suggestions[index], 'test')
                 self.assertIn(LEARNING_CHECKS[key]['explanation'], result.reply)
+                self.assertEqual(result.feedback['correct'], 'ABC'[index] == LEARNING_CHECKS[key]['correct'])
+                self.assertEqual(result.feedback['selected'], question.suggestions[index])
+                self.assertIn(result.feedback['answer'], result.reply)
+                self.assertIn('PARA PROTEGER TUS DATOS', result.reply)
                 self.assertNotIn('test', SESSIONS)
 
     def test_recommendations_follow_areas_not_only_total(self):
@@ -51,12 +56,56 @@ class GuidedChatTests(unittest.TestCase):
 
     def test_every_simulation_choice_produces_feedback(self):
         for scenario in SIMULATIONS.values():
-            for choice in scenario['options']:
+            for choices in product(range(3), repeat=4):
                 answer_message('🎯 Hacer una simulación', 'test')
-                answer_message(scenario['label'], 'test')
-                result = answer_message(choice, 'test')
-                self.assertGreater(len(result.reply), 100)
+                result = answer_message(scenario['label'], 'test')
+                for index, selected in enumerate(choices):
+                    self.assertEqual(result.simulation['current'], index + 1)
+                    result = answer_message(result.suggestions[selected], 'test')
+                    self.assertIn(scenario['steps'][index]['explanations'][selected], result.reply)
+                    self.assertEqual(result.simulation['phase'], 'feedback')
+                    self.assertEqual(result.feedback['correct'], 'ABC'[selected] == scenario['steps'][index]['correct'])
+                    self.assertIn('RESPUESTA CORRECTA Y POR QUÉ', result.reply)
+                    self.assertIn(result.feedback['answer'], result.reply)
+                    self.assertIn(result.feedback['support'], result.reply)
+                    result = answer_message(result.suggestions[0], 'test')
+                self.assertEqual(result.simulation['phase'], 'complete')
+                expected = sum('ABC'[choice] == stage['correct'] for choice, stage in zip(choices, scenario['steps']))
+                self.assertIn(f'{expected} de 4', result.reply)
+                self.assertIn('TU SIGUIENTE ACCIÓN', result.reply)
                 self.assertNotIn('test', SESSIONS)
+
+    def test_simulation_rejects_stale_options_and_early_continue(self):
+        scenario = next(iter(SIMULATIONS.values()))
+        answer_message('🎯 Hacer una simulación', 'test')
+        answer_message(scenario['label'], 'test')
+        result = answer_message('Continuar al siguiente paso', 'test')
+        self.assertEqual(result.simulation['phase'], 'decision')
+        self.assertEqual(len(SESSIONS['test']['decisions']), 0)
+        answer_message(result.suggestions[0], 'test')
+        answer_message('Continuar al siguiente paso', 'test')
+        result = answer_message(scenario['steps'][0]['options'][0], 'test')
+        self.assertEqual(result.simulation['current'], 2)
+        self.assertEqual(len(SESSIONS['test']['decisions']), 1)
+
+    def test_hint_preserves_stage_and_does_not_count_as_decision(self):
+        scenario = next(iter(SIMULATIONS.values()))
+        answer_message('🎯 Hacer una simulación', 'test')
+        answer_message(scenario['label'], 'test')
+        result = answer_message('Necesito una pista', 'test')
+        self.assertIn('PISTA PARA DECIDIR', result.reply)
+        self.assertEqual(result.simulation['current'], 1)
+        self.assertEqual(SESSIONS['test']['decisions'], [])
+        self.assertEqual(result.suggestions[:3], scenario['steps'][0]['options'])
+
+    def test_learning_groups_cover_all_topics_without_duplicates(self):
+        grouped = [key for values in LEARNING_GROUPS.values() for key in values]
+        self.assertEqual(len(grouped), len(set(grouped)))
+        self.assertEqual(set(grouped), set(EDUCATION_TOPICS))
+        for label, keys in LEARNING_GROUPS.items():
+            answer_message('Educación y simulación', 'test')
+            result = answer_message(label, 'test')
+            self.assertEqual(result.suggestions[:len(keys)], [EDUCATION_TOPICS[key]['label'] for key in keys])
 
     def test_switch_module_from_education_content(self):
         for topic in EDUCATION_OPTIONS:
@@ -77,7 +126,7 @@ class GuidedChatTests(unittest.TestCase):
             self.assertNotIn('test', SESSIONS)
 
     def test_restart_can_exit_every_active_state(self):
-        for mode in ['guidance-menu', 'guidance-question', 'education-menu', 'simulation-menu', 'simulation-answer', 'assessment']:
+        for mode in ['guidance-menu', 'guidance-question', 'education-menu', 'simulation-menu', 'simulation-answer', 'simulation-feedback', 'assessment']:
             SESSIONS['test'] = {'mode': mode}
             result = answer_message('🏠 Volver al inicio', 'test')
             self.assertNotIn('test', SESSIONS)

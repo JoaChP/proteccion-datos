@@ -12,7 +12,7 @@ from fastapi import FastAPI, Query, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from .chat_sources import supporting_sources
-from .learning_content import EXTENDED_TOPICS, LEARNING_CHECKS, assessment_report
+from .learning_content import EXTENDED_TOPICS, PLAIN_TOPICS, LEARNING_CHECKS, assessment_report
 
 API_PREFIX = "/api/v1"
 DEFAULT_ORIGINS = (
@@ -49,6 +49,8 @@ class ChatReply(BaseModel):
     sources: list[dict[str, str]] = Field(default_factory=list)
     progress: dict[str, int] | None = None
     areas: list[dict[str, Any]] = Field(default_factory=list)
+    simulation: dict[str, Any] | None = None
+    feedback: dict[str, Any] | None = None
 
     def __init__(
         self,
@@ -1026,374 +1028,22 @@ EDUCATION_TOPICS = {
 
 }
 
+EDUCATION_TOPICS.update(PLAIN_TOPICS)
 EDUCATION_TOPICS.update(EXTENDED_TOPICS)
 EDUCATION_OPTIONS = [item["label"] for item in EDUCATION_TOPICS.values()]
+LEARNING_GROUPS = {
+    'Proteger mis cuentas y dispositivos': ['phishing', 'passwords', '2fa', 'identity', 'malware', 'internet'],
+    'Cuidar mis datos y conocer mis derechos': ['privacy', 'personal_data', 'law', 'lifecycle', 'institutions'],
+    'Comprender cómo funciona la ciberseguridad': ['cia', 'risk', 'resilience', 'international'],
+}
 
 
 # ============================================================
 # SIMULACIONES EDUCATIVAS
 # ============================================================
 
-SIMULATIONS = {
+from .simulation_content import SIMULATIONS, stage_reply
 
-    "banco": {
-        "label": "Correo sospechoso de un banco",
-        "question": (
-            "🎓 SIMULACIÓN: CORREO BANCARIO\n\n"
-            "Recibes un correo aparentemente enviado por tu banco. "
-            "El mensaje indica:\n\n"
-            "\"Su cuenta será suspendida hoy debido a una actividad "
-            "inusual. Para evitar el bloqueo, confirme sus datos "
-            "inmediatamente haciendo clic en el siguiente enlace\".\n\n"
-            "El mensaje contiene el logotipo del banco y solicita que "
-            "ingreses tu usuario, contraseña y un código de seguridad.\n\n"
-            "¿Qué decisión tomarías?"
-        ),
-        "options": [
-            "A) Abro el enlace e ingreso los datos solicitados.",
-            "B) Ignoro el enlace y verifico la situación mediante el sitio o aplicación oficial del banco.",
-            "C) Respondo el correo para confirmar si realmente fue enviado por el banco.",
-        ],
-        "feedback": {
-            "A": (
-                "❌ DECISIÓN DE ALTO RIESGO\n\n"
-                "Ingresar credenciales y códigos mediante un enlace recibido "
-                "inesperadamente puede permitir que un atacante capture "
-                "información de acceso.\n\n"
-
-                "🔎 ¿QUÉ SEÑALES APARECEN EN EL ESCENARIO?\n"
-                "• Existe una situación de urgencia.\n"
-                "• Se amenaza con suspender la cuenta.\n"
-                "• Se solicita información confidencial.\n"
-                "• Se proporciona un enlace para realizar la acción.\n"
-                "• Se solicita incluso un código de seguridad.\n\n"
-
-                "🎣 ESTO PUEDE CORRESPONDER A PHISHING\n"
-                "El hecho de que el correo utilice el logotipo o apariencia "
-                "de una institución no demuestra que sea auténtico.\n\n"
-
-                "🛡️ ¿QUÉ DEBISTE HACER?\n"
-                "Debiste ingresar directamente al sitio oficial o utilizar "
-                "la aplicación oficial del banco para comprobar si existe "
-                "algún problema con la cuenta.\n\n"
-
-                "📚 APRENDIZAJE\n"
-                "Nunca debes entregar contraseñas o códigos de autenticación "
-                "a través de enlaces recibidos inesperadamente. La urgencia "
-                "es una de las técnicas utilizadas para provocar decisiones "
-                "impulsivas."
-            ),
-
-            "B": (
-                "✅ EXCELENTE DECISIÓN\n\n"
-                "Evitar el enlace y verificar la situación mediante un canal "
-                "oficial independiente es la alternativa más segura.\n\n"
-
-                "🔎 ¿POR QUÉ?\n"
-                "El mensaje intenta provocar una reacción rápida mediante "
-                "una supuesta suspensión de la cuenta. En lugar de seguir "
-                "las instrucciones del mensaje, verificas directamente "
-                "con la institución.\n\n"
-
-                "🛡️ BUENA PRÁCTICA\n"
-                "• Escribe manualmente la dirección oficial.\n"
-                "• Utiliza la aplicación oficial.\n"
-                "• No compartas contraseñas ni códigos.\n"
-                "• Verifica cualquier alerta desde el canal oficial.\n\n"
-
-                "📋 PROTECCIÓN DE DATOS\n"
-                "Tus credenciales permiten acceder a información personal "
-                "y, en algunos servicios, financiera. Protegerlas también "
-                "forma parte de proteger tus datos personales.\n\n"
-
-                "📚 APRENDIZAJE\n"
-                "Ante un mensaje sospechoso, no debes preguntarte únicamente "
-                "si 'parece real'. Debes verificarlo utilizando un canal "
-                "independiente y confiable."
-            ),
-
-            "C": (
-                "⚠️ NO ES LA MEJOR OPCIÓN\n\n"
-                "Responder al correo no permite confirmar que el remitente "
-                "sea realmente el banco. Si el mensaje es fraudulento, "
-                "estarías continuando la comunicación con el posible atacante.\n\n"
-
-                "🔎 ¿QUÉ DEBES RECORDAR?\n"
-                "Un remitente puede ser falsificado o una cuenta puede haber "
-                "sido comprometida. Por eso no debes utilizar el mismo canal "
-                "sospechoso para verificar la información.\n\n"
-
-                "🛡️ ALTERNATIVA SEGURA\n"
-                "Utiliza directamente el sitio oficial, la aplicación oficial "
-                "o un número de contacto obtenido de una fuente confiable.\n\n"
-
-                "📚 APRENDIZAJE\n"
-                "La verificación debe hacerse por un canal independiente, "
-                "no mediante el mismo mensaje que genera la sospecha."
-            ),
-        },
-    },
-
-    "viaje": {
-        "label": "Datos personales en redes sociales",
-        "question": (
-            "🎓 SIMULACIÓN: PRIVACIDAD EN REDES SOCIALES\n\n"
-            "Una persona publica una fotografía de sus boletos de avión "
-            "antes de realizar un viaje.\n\n"
-            "En la fotografía pueden observarse su nombre completo, "
-            "número de documento, código de reserva, fecha del vuelo "
-            "y nombre del hotel donde se hospedará.\n\n"
-            "¿Cuál es la decisión más segura?"
-        ),
-        "options": [
-            "A) Publicar la fotografía porque únicamente sus amigos pueden verla.",
-            "B) Evitar publicar el documento y ocultar información personal e identificadores.",
-            "C) Publicarla porque los datos de un boleto no representan información importante.",
-        ],
-        "feedback": {
-            "A": (
-                "⚠️ DECISIÓN DE RIESGO\n\n"
-                "Aunque el perfil tenga restricciones de privacidad, publicar "
-                "documentos o información detallada puede aumentar la exposición "
-                "de datos personales.\n\n"
-
-                "Además, las publicaciones pueden ser capturadas, reenviadas "
-                "o visualizadas por personas que no esperabas.\n\n"
-
-                "📋 ¿QUÉ INFORMACIÓN ESTÁ EXPUESTA?\n"
-                "• Identidad.\n"
-                "• Información del viaje.\n"
-                "• Fechas y horarios.\n"
-                "• Código de reserva.\n"
-                "• Lugar de alojamiento.\n\n"
-
-                "🛡️ BUENA PRÁCTICA\n"
-                "Evita publicar documentos completos. Si deseas compartir "
-                "una experiencia, elimina u oculta los identificadores y "
-                "otra información innecesaria.\n\n"
-
-                "📚 APRENDIZAJE\n"
-                "Configurar un perfil como privado reduce la exposición, "
-                "pero no elimina el riesgo. La privacidad también depende "
-                "del tipo de información que decides publicar."
-            ),
-
-            "B": (
-                "✅ CORRECTO\n\n"
-                "Evitar la publicación de documentos e identificadores "
-                "reduce la cantidad de información personal disponible.\n\n"
-
-                "🔎 ¿POR QUÉ?\n"
-                "Los datos de un boleto pueden revelar información sobre "
-                "la identidad, desplazamientos y planes de una persona.\n\n"
-
-                "🛡️ BUENA PRÁCTICA\n"
-                "Si quieres publicar una fotografía del viaje, evita mostrar "
-                "números de documento, códigos de reserva, datos de contacto, "
-                "itinerarios completos o información que permita identificar "
-                "servicios utilizados.\n\n"
-
-                "📚 APRENDIZAJE\n"
-                "Antes de publicar debes preguntarte qué información contiene "
-                "la imagen y si realmente es necesario hacerla pública."
-            ),
-
-            "C": (
-                "❌ INCORRECTO\n\n"
-                "Los boletos y documentos pueden contener información que "
-                "permita identificar a una persona o conocer detalles de "
-                "sus actividades.\n\n"
-
-                "📋 PROTECCIÓN DE DATOS\n"
-                "La protección de datos personales también implica reducir "
-                "la exposición innecesaria de información.\n\n"
-
-                "🛡️ RECUERDA\n"
-                "No debes evaluar únicamente si el dato parece importante. "
-                "También debes considerar qué puede descubrir otra persona "
-                "al combinarlo con información disponible en otros lugares.\n\n"
-
-                "📚 APRENDIZAJE\n"
-                "La combinación de varios datos aparentemente pequeños "
-                "puede generar un perfil mucho más completo de una persona."
-            ),
-        },
-    },
-
-    "app": {
-        "label": "Descarga de una aplicación",
-        "question": (
-            "🎓 SIMULACIÓN: APLICACIÓN MÓVIL\n\n"
-            "Encuentras una aplicación gratuita de edición de fotografías "
-            "fuera de una tienda oficial.\n\n"
-            "Antes de instalarla observas que solicita acceso a:\n"
-            "• Contactos.\n"
-            "• Ubicación.\n"
-            "• Micrófono.\n"
-            "• Cámara.\n"
-            "• Galería de fotografías.\n\n"
-            "La aplicación no explica claramente por qué necesita todos "
-            "esos permisos.\n\n"
-            "¿Qué haces?"
-        ),
-        "options": [
-            "A) La instalo porque es gratuita y esos permisos son normales.",
-            "B) No la instalo hasta verificar la fuente, reputación y necesidad de los permisos.",
-            "C) La instalo y acepto todos los permisos para comprobar cómo funciona.",
-        ],
-        "feedback": {
-            "A": (
-                "❌ DECISIÓN DE ALTO RIESGO\n\n"
-                "El hecho de que una aplicación sea gratuita no significa "
-                "que sea segura ni que todos los permisos solicitados sean "
-                "necesarios.\n\n"
-
-                "🚨 SEÑALES DE ALERTA\n"
-                "• Fuente no oficial.\n"
-                "• Múltiples permisos.\n"
-                "• Falta de explicación clara sobre su finalidad.\n\n"
-
-                "📋 DATOS QUE PODRÍAN EXPONERSE\n"
-                "Los permisos pueden permitir acceso a información personal, "
-                "fotografías, ubicación, contactos u otros recursos del dispositivo.\n\n"
-
-                "🛡️ BUENA PRÁCTICA\n"
-                "Verifica primero la procedencia de la aplicación, su reputación "
-                "y la necesidad de cada permiso.\n\n"
-
-                "📚 APRENDIZAJE\n"
-                "Los permisos deben analizarse de acuerdo con la función "
-                "que ofrece la aplicación. Más permisos no significa mejor funcionamiento."
-            ),
-
-            "B": (
-                "✅ CORRECTO\n\n"
-                "Verificar la fuente, reputación y necesidad de los permisos "
-                "antes de instalar una aplicación es una práctica preventiva adecuada.\n\n"
-
-                "🔎 ¿QUÉ DEBES REVISAR?\n"
-                "• Procedencia de la aplicación.\n"
-                "• Reputación del desarrollador.\n"
-                "• Permisos solicitados.\n"
-                "• Finalidad de esos permisos.\n"
-                "• Información de privacidad disponible.\n\n"
-
-                "📋 PROTECCIÓN DE DATOS\n"
-                "Una aplicación puede acceder a información personal del "
-                "dispositivo. Por eso es importante conceder únicamente "
-                "los permisos necesarios.\n\n"
-
-                "📚 APRENDIZAJE\n"
-                "La seguridad comienza antes de instalar una aplicación: "
-                "primero verifica qué estás instalando y qué información "
-                "podría llegar a utilizar."
-            ),
-
-            "C": (
-                "⚠️ DECISIÓN DE RIESGO\n\n"
-                "Instalar la aplicación y aceptar todos los permisos sin "
-                "comprender su finalidad aumenta innecesariamente la exposición "
-                "de información.\n\n"
-
-                "🛡️ MEJOR ALTERNATIVA\n"
-                "Primero verifica la fuente y analiza los permisos. "
-                "Si los permisos no tienen una relación clara con la función "
-                "de la aplicación, es mejor no continuar.\n\n"
-
-                "📚 APRENDIZAJE\n"
-                "Aceptar permisos sin analizarlos puede permitir que una "
-                "aplicación acceda a información que no necesita para cumplir "
-                "su función."
-            ),
-        },
-    },
-
-    "empleo": {
-        "label": "Oferta de empleo sospechosa",
-        "question": (
-            "🎓 SIMULACIÓN: OFERTA DE EMPLEO\n\n"
-            "Recibes una supuesta oferta de empleo mediante redes sociales.\n\n"
-            "Antes de una entrevista formal te solicitan enviar por WhatsApp "
-            "una fotografía de tu documento de identidad, datos bancarios, "
-            "una fotografía personal y una copia de otros documentos.\n\n"
-            "La persona que te contacta asegura que 'todos los candidatos "
-            "deben enviarlos inmediatamente'.\n\n"
-            "¿Cómo reaccionas?"
-        ),
-        "options": [
-            "A) Envío todos los documentos porque quiero conseguir el empleo.",
-            "B) Verifico primero la empresa, el proceso y la finalidad de cada dato solicitado.",
-            "C) Envío únicamente los documentos que me soliciten por WhatsApp.",
-        ],
-        "feedback": {
-            "A": (
-                "❌ DECISIÓN DE ALTO RIESGO\n\n"
-                "El interés por conseguir un empleo no debe llevarte a "
-                "entregar información personal sensible sin verificar "
-                "la legitimidad del proceso.\n\n"
-
-                "🚨 SEÑALES DE ALERTA\n"
-                "• Solicitud de numerosos datos antes de verificar la empresa.\n"
-                "• Presión para enviarlos inmediatamente.\n"
-                "• Uso de un canal informal sin comprobar el proceso.\n"
-                "• Falta de explicación clara sobre la finalidad.\n\n"
-
-                "🛡️ ¿QUÉ DEBES HACER?\n"
-                "Verifica la empresa mediante sus canales oficiales y "
-                "determina qué información es realmente necesaria para "
-                "la etapa del proceso.\n\n"
-
-                "📚 APRENDIZAJE\n"
-                "Una solicitud de información personal debe evaluarse "
-                "por quién la realiza, para qué la necesita y cómo "
-                "será utilizada."
-            ),
-
-            "B": (
-                "✅ CORRECTO\n\n"
-                "Antes de entregar información personal debes comprobar "
-                "que el proceso laboral sea legítimo y comprender la finalidad "
-                "de los datos solicitados.\n\n"
-
-                "🔎 VERIFICA\n"
-                "• Existencia de la empresa.\n"
-                "• Identidad del reclutador.\n"
-                "• Proceso de contratación.\n"
-                "• Canal oficial utilizado por la organización.\n"
-                "• Finalidad de cada dato solicitado.\n\n"
-
-                "📋 PROTECCIÓN DE DATOS\n"
-                "No toda información personal debe entregarse simplemente "
-                "porque una persona la solicite. Es importante evaluar "
-                "la necesidad y finalidad de la solicitud.\n\n"
-
-                "📚 APRENDIZAJE\n"
-                "La prevención consiste en detenerse antes de compartir "
-                "información y verificar la legitimidad de la solicitud."
-            ),
-
-            "C": (
-                "❌ INCORRECTO\n\n"
-                "El hecho de que una persona solicite información mediante "
-                "WhatsApp no demuestra que la solicitud sea legítima.\n\n"
-
-                "Además, enviar únicamente algunos documentos no elimina "
-                "el riesgo si todavía no has comprobado quién recibe "
-                "la información ni para qué la utilizará.\n\n"
-
-                "🛡️ BUENA PRÁCTICA\n"
-                "Primero verifica la organización y el proceso mediante "
-                "canales oficiales. Después evalúa qué información es "
-                "realmente necesaria.\n\n"
-
-                "📚 APRENDIZAJE\n"
-                "El canal utilizado y la apariencia profesional del contacto "
-                "no son suficientes para demostrar legitimidad."
-            ),
-        },
-    },
-
-}
 SIMULATION_OPTIONS = [item["label"] for item in SIMULATIONS.values()]
 
 
@@ -1729,11 +1379,12 @@ def education_menu_reply() -> ChatReply:
     return ChatReply(
         (
             "🎓 EDUCACIÓN Y APRENDIZAJE\n\n"
-            "Selecciona un tema. Encontrarás una explicación, ejemplos, "
-            "medidas preventivas y, cuando corresponda, una actividad para "
-            "comprobar lo aprendido."
+            "¿Qué quieres aprender hoy? Elige un grupo y después un tema.\n\n"
+            "Cada tema sigue tres pasos: una explicación breve, un ejemplo "
+            "y una pregunta con respuesta explicada. Si no sabes por dónde "
+            "empezar, elige proteger tus cuentas."
         ),
-        EDUCATION_OPTIONS + ["🎯 Hacer una simulación", "🏠 Volver al inicio"],
+        list(LEARNING_GROUPS) + ["🎯 Hacer una simulación", "🏠 Volver al inicio"],
     )
 
 
@@ -1741,9 +1392,10 @@ def simulation_menu_reply() -> ChatReply:
     return ChatReply(
         (
             "🎯 SIMULACIONES EDUCATIVAS\n\n"
-            "Selecciona un escenario cotidiano y toma una decisión. "
-            "Después recibirás retroalimentación explicando por qué la "
-            "decisión representa una buena práctica o un riesgo."
+            "Practica sin usar datos reales. Cada recorrido tiene cuatro pasos: "
+            "reconocer, verificar, actuar y dar seguimiento.\n\n"
+            "Elige una opción en cada paso. Después verás qué puede ocurrir "
+            "y por qué conviene esa decisión. Puedes salir desde el menú lateral."
         ),
         SIMULATION_OPTIONS + ["🎓 Quiero aprender", "🏠 Volver al inicio"],
     )
@@ -1978,10 +1630,13 @@ def answer_message(message: str, session_id: str) -> ChatReply:
         if index is None:
             return ChatReply('Selecciona una de las alternativas para recibir retroalimentación.', quiz['options'])
         choice = 'ABC'[index]
-        title = 'BUENA DECISIÓN' if choice == quiz['correct'] else 'OPORTUNIDAD PARA APRENDER'
+        correct = choice == quiz['correct']
+        title = 'RESPUESTA CORRECTA' if correct else 'RESPUESTA INCORRECTA EN ESTE EJERCICIO'
+        correct_option = quiz['options']['ABC'.index(quiz['correct'])]
+        support = '¡Bien! Identificaste el criterio que ayuda a proteger tus datos. Ahora puedes practicar cómo aplicarlo.' if correct else 'Gracias por intentarlo. Esta situación puede generar dudas. Puedes aprender de esta elección sin exponerte a un riesgo real.'
         topic = EDUCATION_TOPICS[state['topic']]
         SESSIONS.pop(session_id, None)
-        return ChatReply(f"{title}\n\n{quiz['explanation']}\n\nSIGUIENTE PASO\nAplica este criterio en una simulación o continúa con otro tema.", ['🎯 Hacer una simulación', '📚 Elegir otro tema', '🏠 Volver al inicio'], sources=topic.get('sources', []))
+        return ChatReply(f"{title}\n{support}\n\nTU RESPUESTA\n{quiz['options'][index]}\n\nRESPUESTA CORRECTA Y POR QUÉ\n{correct_option}\n{quiz['explanation']}\n\nPARA PROTEGER TUS DATOS\n{topic['content'].split('APLICA LO APRENDIDO')[-1].strip()}\n\nSIGUIENTE PASO\nPractica este criterio en una simulación o vuelve a revisar otro tema a tu ritmo.", ['🎯 Hacer una simulación', '📚 Elegir otro tema', '🏠 Volver al inicio'], sources=topic.get('sources', []), feedback={'correct': correct, 'selected': quiz['options'][index], 'answer': correct_option, 'support': support})
 
     # --------------------------------------------------------
     # MENÚ DE ORIENTACIÓN
@@ -2050,6 +1705,10 @@ def answer_message(message: str, session_id: str) -> ChatReply:
     # MENÚ DE EDUCACIÓN
     # --------------------------------------------------------
     if state and state["mode"] == "education-menu":
+        group = next((label for label in LEARNING_GROUPS if normalize(label) == text), None)
+        if group:
+            state['group'] = group
+            return ChatReply(f"{group}\n\nElige un tema. Puedes leer a tu ritmo y luego comprobar lo aprendido.", [EDUCATION_TOPICS[key]['label'] for key in LEARNING_GROUPS[group]] + ['📚 Elegir otro tema', '🏠 Volver al inicio'])
         selected = find_option_index(
             message,
             EDUCATION_OPTIONS,
@@ -2099,62 +1758,56 @@ def answer_message(message: str, session_id: str) -> ChatReply:
 
         scenario_key = scenario_keys[selected]
         simulation = SIMULATIONS[scenario_key]
+        state.update(mode="simulation-answer", scenario=scenario_key, step=0, decisions=[])
+        return ChatReply(stage_reply(simulation, 0), simulation['steps'][0]['options'] + ['Necesito una pista'],
+                         sources=simulation['sources'], simulation={'title': simulation['label'], 'current': 1, 'total': 4, 'phase': 'decision'})
 
-        state.update(
-            {
-                "mode": "simulation-answer",
-                "scenario": scenario_key,
-                "options": simulation["options"],
-            }
-        )
-
-        return ChatReply(
-            simulation["question"],
-            simulation["options"],
-        )
-
-    # --------------------------------------------------------
-    # RESPUESTA DE SIMULACIÓN
-    # --------------------------------------------------------
-    if state and state["mode"] == "simulation-answer":
-        choice = option_letter(message)
-
-        if choice is None:
-            return ChatReply(
-                "Selecciona A, B o C para recibir la retroalimentación.",
-                state["options"],
-            )
-
-        simulation = SIMULATIONS.get(state["scenario"])
-
+    if state and state['mode'] in {'simulation-answer', 'simulation-feedback'}:
+        simulation = SIMULATIONS.get(state['scenario'])
         if simulation is None:
             SESSIONS.pop(session_id, None)
             return root_reply()
-
-        feedback = simulation["feedback"].get(choice)
-
-        if feedback is None:
-            return ChatReply(
-                "Selecciona A, B o C para recibir la retroalimentación.",
-                state["options"],
-            )
-
-        SESSIONS.pop(session_id, None)
-
-        return ChatReply(
-            (
-                f"{feedback}\n\n"
-                "📚 La simulación busca fortalecer tu capacidad "
-                "para reconocer riesgos y tomar decisiones preventivas.\n\n"
-                "¿Qué deseas hacer ahora?"
-            ),
-            [
-                "🎓 Quiero aprender",
-                "🆘 Orientación ante una situación",
-                "🛡️ Evaluar mis prácticas digitales",
-                "🏠 Volver al inicio",
-            ],
-        )
+        index = state['step']
+        item = simulation['steps'][index]
+        meta = {'title': simulation['label'], 'current': index + 1, 'total': 4, 'phase': 'decision'}
+        if state['mode'] == 'simulation-feedback':
+            final = index == len(simulation['steps']) - 1
+            action = 'Ver mi resumen' if final else 'Continuar al siguiente paso'
+            if normalize(message) != normalize(action):
+                return ChatReply('Lee la explicación y selecciona cómo continuar.', [action, '🎯 Hacer una simulación'], simulation={**meta, 'phase': 'feedback'})
+            if not final:
+                state.update(mode='simulation-answer', step=index + 1)
+                chosen = 'ABC'.index(state['decisions'][-1]['label'][0])
+                recap = 'Sobre tu decisión anterior: ' + item['explanations'][chosen]
+                return ChatReply(stage_reply(simulation, index + 1, recap), simulation['steps'][index + 1]['options'] + ['Necesito una pista'], sources=simulation['sources'], simulation={**meta, 'current': index + 2})
+            decisions = state['decisions']
+            secure = sum(d['correct'] for d in decisions)
+            review = []
+            for number, decision in enumerate(decisions, 1):
+                original = simulation['steps'][number - 1]
+                correct_index = 'ABC'.index(original['correct'])
+                outcome = 'Correcta' if decision['correct'] else 'Incorrecta en este ejercicio; puedes mejorar este criterio'
+                review.append(f"PASO {number} · {original['title'].upper()}\nResultado: {outcome}\nTu elección: {decision['label']}\nRespuesta correcta: {original['options'][correct_index]}\nPor qué: {original['explanations'][correct_index]}")
+            reinforce = [simulation['steps'][i]['title'].lower() for i, d in enumerate(decisions) if not d['correct']]
+            focus = 'Refuerza: ' + ', '.join(reinforce) + '.' if reinforce else 'Reconociste los criterios preventivos de las cuatro etapas. Sigue aplicándolos en situaciones nuevas.'
+            SESSIONS.pop(session_id, None)
+            return ChatReply(f"RECORRIDO COMPLETADO\n{simulation['label']} · {secure} de 4 decisiones alineadas con el criterio preventivo. Este ejercicio no mide tu riesgo real.\n\n" + '\n\n'.join(review) + f"\n\nTU SIGUIENTE ACCIÓN\n{focus}", ['🎯 Hacer una simulación', '🎓 Quiero aprender', '🆘 Orientación ante una situación', '🏠 Volver al inicio'], sources=simulation['sources'], simulation={**meta, 'phase': 'complete'})
+        if text == normalize('Necesito una pista'):
+            clue = item['explanations']['ABC'.index(item['correct'])]
+            return ChatReply(f"PISTA PARA DECIDIR\n{clue}\n\nVUELVE A LA SITUACIÓN\n{item['scene']}\n\nTU DECISIÓN\n{item['question']}", item['options'] + ['Necesito una pista'], sources=simulation['sources'], simulation=meta)
+        selected = find_option_index(message, item['options'])
+        if selected is None:
+            return ChatReply(stage_reply(simulation, index), item['options'] + ['Necesito una pista'], sources=simulation['sources'], simulation=meta)
+        correct = 'ABC'[selected] == item['correct']
+        state['decisions'].append({'label': item['options'][selected], 'correct': correct})
+        state['mode'] = 'simulation-feedback'
+        heading = 'RESPUESTA CORRECTA' if correct else 'RESPUESTA INCORRECTA EN ESTE EJERCICIO'
+        correct_index = 'ABC'.index(item['correct'])
+        explanation = item['explanations'][selected]
+        support = '¡Bien hecho! Elegiste la alternativa que mejor protege tus datos en esta situación.' if correct else 'Es comprensible que esta situación genere dudas. Este es un espacio para practicar: revisemos juntos cómo protegerte mejor.'
+        correct_option = item['options'][correct_index]
+        rationale = item['explanations'][correct_index]
+        return ChatReply(f"{heading}\n{support}\n\nTU RESPUESTA\n{item['options'][selected]}\n{explanation}\n\nRESPUESTA CORRECTA Y POR QUÉ\n{correct_option}\n{rationale}\n\nCÓMO APLICARLO\n{item['consequence']}\n\nUN PASO PARA PROTEGERTE\n{correct_option[3:]}\nAntes de actuar en una situación real, verifica el canal y evita entregar información que no sea necesaria.", ['Ver mi resumen' if index == 3 else 'Continuar al siguiente paso', '🎯 Hacer una simulación'], sources=simulation['sources'], simulation={**meta, 'phase': 'feedback'}, feedback={'correct': correct, 'selected': item['options'][selected], 'answer': correct_option, 'support': support})
 
     # --------------------------------------------------------
     # EVALUACIÓN DE RIESGO DIGITAL
@@ -2562,6 +2215,8 @@ def send_chatbot_message(payload: ChatMessage) -> ChatReply:
         sources=result.sources,
         progress=result.progress,
         areas=result.areas,
+        simulation=result.simulation,
+        feedback=result.feedback,
     )
 
 

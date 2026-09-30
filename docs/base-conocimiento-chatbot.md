@@ -5,7 +5,7 @@ Implementación basada en la base inicial, el capítulo II (marco teórico) y el
 ## Recorridos
 
 - **Orientación y asistencia:** fraude, phishing, acceso no autorizado, uso indebido de datos e identidad. Incluye un acceso a derechos y orientación institucional (PRODHAB, OIJ y CSIRT-CR).
-- **Educación y simulación:** quince temas educativos, cada uno con una pregunta de comprensión de tres alternativas y explicación del criterio. Cuatro simulaciones ofrecen retroalimentación: correo bancario, publicación en redes, aplicación y oferta de empleo.
+- **Educación y simulación:** quince temas organizados en tres grupos, cada uno con una pregunta de comprensión de tres alternativas y explicación del criterio. Cuatro simulaciones (mensaje bancario, publicación en redes, permisos de aplicación y oferta de empleo) tienen cuatro etapas: reconocer, verificar, actuar y dar seguimiento. Cada alternativa recibe retroalimentación antes de continuar. Se ofrecen pistas sin avanzar ni contar una decisión. El cierre conserva las elecciones y señala qué etapas reforzar. Los cambios de contexto hipotéticos se presentan explícitamente; no se afirma que el ejercicio determine las consecuencias reales.
 - **Evaluación de riesgo digital:** cinco áreas del documento inicial. El cuestionario excluye el bloque adicional de incidentes de la versión anterior. Cada alternativa suma A=0, B=1, C=2; la puntuación normalizada se interpreta como bajo (hasta 33%), moderado (hasta 66%) o alto. Los umbrales son criterios del prototipo, no una escala validada científicamente. Todas las respuestas B producen nivel moderado.
 
 Los comandos de navegación se resuelven antes de los estados de las preguntas. Los iconos no afectan la comparación de las opciones. El botón permanente de inicio crea una conversación nueva. La evaluación muestra progreso; los mensajes y botones de continuación comparten el área desplazable.
@@ -24,7 +24,7 @@ Los comandos de navegación se resuelven antes de los estados de las preguntas. 
 
 Las recomendaciones se calculan por área, no únicamente a partir del total. Dos personas con igual puntuación global pueden recibir prioridades distintas. Los resultados son orientativos y proceden del autoinforme; no representan un diagnóstico ni una escala validada.
 
-La interfaz mantiene tres recorridos accesibles, respuestas estructuradas, historial desplegable y referencias relacionadas. No utiliza generación abierta de respuestas. La validación académica del contenido y la evaluación de usabilidad descrita en el marco teórico deben realizarse con participantes y revisión experta.
+La interfaz presenta los recorridos con lenguaje cotidiano («Necesito orientación», «Quiero aprender y practicar», «Quiero revisar mis hábitos»), una guía inicial de tres acciones, progreso por etapa, respuestas estructuradas, historial desplegable y referencias relacionadas. El menú educativo evita mostrar quince temas simultáneos. No utiliza generación abierta de respuestas. La validación académica del contenido y la evaluación de usabilidad descrita en el marco teórico deben realizarse con participantes y revisión experta.
 
 ## Revisión de contenido
 
@@ -45,4 +45,6 @@ El servicio entrega referencias bibliográficas y enlaces relacionados con los t
 
 ## Verificación
 
-`backend/.venv/Scripts/python.exe -m unittest discover -s backend -p 'test_*.py' -v` ejecuta nueve pruebas: alternativas de orientación y simulación, 45 alternativas de las comprobaciones educativas, cambio de módulo, evaluación completa en tres niveles, personalización por área, rechazo de opciones fuera de contexto, reinicio y conservación de fuentes durante la traducción. La sesión del backend se mantiene en memoria: un reinicio del proceso pierde el estado. La validación de usabilidad con participantes sigue siendo un trabajo posterior del TFG.
+La retroalimentación identifica explícitamente respuestas correctas e incorrectas en el ejercicio. Incluye la opción elegida, la respuesta correcta con su letra, el fundamento, apoyo sin culpabilizar y una acción preventiva. El resultado y la opción correcta permanecen visibles en un panel fuera del área desplazable; los detalles se leen a ritmo del participante. Esta señal también se entrega como datos estructurados (`feedback`), independiente del texto de la explicación, y se conserva en el resumen de cada etapa. Se comprueban resultados correctos e incorrectos en los temas y en todas las combinaciones de simulación.
+
+`backend/.venv/Scripts/python.exe -m unittest discover -s backend -p 'test_*.py' -v` ejecuta doce pruebas. Incluye los 324 recorridos completos posibles de las cuatro simulaciones (81 combinaciones por escenario), sus resúmenes y puntuaciones educativas; pistas sin avanzar; cobertura de los tres grupos; 45 alternativas de comprobación educativa; orientación; navegación; evaluación y personalización; rechazo de opciones fuera de contexto; reinicio y conservación de fuentes. La sesión del backend se mantiene en memoria: un reinicio del proceso pierde el estado. La validación de usabilidad con participantes sigue siendo un trabajo posterior del TFG.
