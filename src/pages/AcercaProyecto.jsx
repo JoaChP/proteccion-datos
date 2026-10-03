@@ -1,6 +1,10 @@
 import ReadMore, { ReadingHint } from '../components/reading/ReadMore'
 import React from "react";
+import { resources } from "../data/resources";
+import { ApaReference } from "../components/sections/ResourceBibliography";
 import "./AcercaProyecto.css";
+
+const projectReferences = resources.filter(item => ["ley", "estrategia-cr", "nist-completo"].includes(item.id));
 
 const sections = [
   {
@@ -65,7 +69,7 @@ const sections = [
   },
   {
     id: "13",
-    title: "Resultados del proyecto",
+    title: "Productos y estado actual",
     icon: "📊",
   },
   {
@@ -83,6 +87,7 @@ const sections = [
     title: "Consideraciones y propósito",
     icon: "🛡️",
   },
+  { id: "17", title: "Referencias de apoyo", icon: "📚" },
 ];
 
 const scrollToSection = (id) => {
@@ -211,7 +216,7 @@ export default function AcercaProyecto() {
           <div className="about-hero-inner">
 
             <div className="about-hero-eyebrow">
-              EDUCACIÓN CIUDADANA · INNOVACIÓN · TECNOLOGÍA
+              TRABAJO FINAL DE GRADUACIÓN · SISTEMAS DE INFORMACIÓN · COSTA RICA
             </div>
 
             <h1>
@@ -221,10 +226,7 @@ export default function AcercaProyecto() {
             </h1>
 
             <p className="about-hero-description">
-              Trabajo Final de Graduación orientado al diseño e
-              implementación de una página web con un chatbot
-              interactivo para la orientación ciudadana en protección
-              de datos personales y seguridad digital en Costa Rica.
+              Diseño de una Página Web con Chatbot Interactivo para la Orientación Ciudadana en Protección de Datos Personales en Costa Rica.
             </p>
 
             <div className="about-hero-tags">
@@ -444,20 +446,11 @@ export default function AcercaProyecto() {
               </h3>
 
               <p>
-                La propuesta surge de la necesidad de reducir la
-                brecha existente entre el crecimiento del uso de
-                tecnologías digitales y la capacidad de las personas
-                para comprender y gestionar adecuadamente los riesgos
-                asociados con sus datos personales.
+                La propuesta busca acercar el conocimiento sobre protección de datos a las decisiones cotidianas de la ciudadanía. Su fundamentación considera la Ley N.º 8968 (Asamblea Legislativa de la República de Costa Rica, 2011), la Estrategia Nacional de Ciberseguridad 2023–2027 (Ministerio de Ciencia, Innovación, Tecnología y Telecomunicaciones [MICITT], 2023) y el marco de gestión del riesgo del National Institute of Standards and Technology (NIST, 2024).
               </p>
 
               <p>
-                Desde una perspectiva social, el proyecto pretende
-                facilitar el acceso a conocimientos preventivos y
-                herramientas de orientación. Desde una perspectiva
-                tecnológica, integra desarrollo web, bases de datos,
-                interacción persona-sistema y procesos
-                conversacionales estructurados.
+                El aporte propuesto consiste en organizar información documental y normativa en contenidos accesibles y recorridos guiados. Su utilidad y aceptación deben estudiarse mediante la evaluación prevista en el TFG; la disponibilidad de la plataforma no demuestra por sí sola una mejora en el aprendizaje.
               </p>
             </div>
 
@@ -480,8 +473,7 @@ export default function AcercaProyecto() {
               title="Integración de sistemas"
             >
               <p>
-                Integrar interfaz web, backend, base de datos y
-                chatbot dentro de una solución funcional.
+                Integrar interfaz web, servicios de aplicación y flujos del chatbot; diferenciar el modelo de datos previsto de los componentes implementados.
               </p>
             </InfoCard>
 
@@ -574,40 +566,28 @@ export default function AcercaProyecto() {
               number="02"
               title="Diseño tecnológico"
             >
-              Diseñar la arquitectura tecnológica de la página web,
-              la base de datos y la integración del chatbot
-              interactivo, definiendo la estructura funcional y los
-              flujos conversacionales necesarios.
+              Diseñar la arquitectura tecnológica de la página web, la base de datos y la integración del chatbot interactivo, definiendo la estructura funcional y los flujos conversacionales necesarios para la orientación, evaluación y prevención en protección de datos personales y seguridad digital.
             </ObjectiveCard>
 
             <ObjectiveCard
               number="03"
               title="Desarrollo de la plataforma"
             >
-              Desarrollar la página web con secciones sobre
-              protección de datos personales, buenas prácticas de
-              privacidad, recursos educativos y contenidos de
-              prevención y seguridad digital.
+              Desarrollar la página web con secciones sobre protección de datos personales, buenas prácticas de privacidad, recursos educativos y contenidos de prevención y seguridad digital, para la facilitación del acceso de la ciudadanía a información clara y accesible sobre protección de datos personales.
             </ObjectiveCard>
 
             <ObjectiveCard
               number="04"
               title="Implementación del chatbot"
             >
-              Implementar un chatbot interactivo dentro de la página
-              web para la orientación y evaluación del usuario
-              mediante flujos conversacionales y recomendaciones
-              preventivas.
+              Implementar un chatbot interactivo dentro de la página web para la orientación y evaluación al usuario mediante flujos conversacionales, brindando recomendaciones preventivas relacionadas con la protección de datos personales y la seguridad digital.
             </ObjectiveCard>
 
             <ObjectiveCard
               number="05"
               title="Evaluación"
             >
-              Probar el uso y la aceptación de la página web
-              informativa y del chatbot interactivo con distintos
-              grupos de usuarios para evaluar su usabilidad y
-              utilidad como herramienta de orientación ciudadana.
+              Probar el uso y la aceptación de la página web informativa y del chatbot interactivo con distintos grupos de usuarios, para la evaluación de su usabilidad y utilidad como herramienta.
             </ObjectiveCard>
 
           </div>
@@ -632,17 +612,14 @@ export default function AcercaProyecto() {
           />
 
           <p className="about-section-intro">
-            El desarrollo del proyecto se organiza mediante un
-            proceso progresivo que permite pasar de la investigación
-            y comprensión del contexto a la construcción,
-            evaluación y mejora de la solución tecnológica.
+            El informe define una investigación aplicada, de enfoque cuantitativo y alcance descriptivo, orientada mediante Design Science Research (DSR). El proyecto se organiza en cinco etapas que relacionan el análisis del contexto, la construcción del artefacto y su evaluación.
           </p>
 
           <div className="about-process">
 
             <ProcessStep
               number="01"
-              title="Investigación exploratoria y análisis del contexto"
+              title="Investigación y análisis del contexto"
             >
               Revisión de literatura, normativa, documentación
               institucional y referentes nacionales e internacionales
@@ -673,27 +650,14 @@ export default function AcercaProyecto() {
               number="04"
               title="Desarrollo e implementación"
             >
-              Construcción de la plataforma web, implementación de
-              la base de datos, desarrollo del chatbot e integración
-              de los componentes tecnológicos.
+              Construcción de la interfaz web, los servicios de aplicación y los flujos del chatbot. La implementación del almacenamiento relacional previsto debe distinguirse del funcionamiento actual del prototipo.
             </ProcessStep>
 
             <ProcessStep
               number="05"
               title="Evaluación y validación"
             >
-              Aplicación de pruebas funcionales y evaluación con
-              usuarios para analizar la funcionalidad, utilidad y
-              experiencia de interacción.
-            </ProcessStep>
-
-            <ProcessStep
-              number="06"
-              title="Análisis y mejora continua"
-            >
-              Análisis de resultados, identificación de oportunidades
-              de mejora y aplicación de ajustes sobre la solución
-              tecnológica.
+              Pruebas funcionales y de integración, y evaluación prevista con personas usuarias mediante encuesta y cuestionario estructurado. El informe contempla una muestra no probabilística por conveniencia, participación voluntaria y análisis con estadística descriptiva. No se presentan resultados de participantes sin evidencia documentada.
             </ProcessStep>
 
           </div>
@@ -754,10 +718,10 @@ export default function AcercaProyecto() {
 
             <div className="about-architecture-node">
               <span>03</span>
-              <strong>Base de datos</strong>
-              <small>Relacional</small>
+              <strong>Conocimiento estructurado</strong>
+              <small>Archivos y reglas del prototipo</small>
               <p>
-                Gestión estructurada de contenidos y procesos.
+                Contenidos y reglas definidos en el código; interacción temporal sin almacenamiento relacional implementado.
               </p>
             </div>
 
@@ -782,14 +746,11 @@ export default function AcercaProyecto() {
             </InfoCard>
 
             <InfoCard
-              label="BASE DE DATOS"
+              label="DISEÑO DE DATOS PREVISTO"
               title="Gestión estructurada del conocimiento"
             >
               <p>
-                El modelo contempla estructuras destinadas a
-                gestionar diagnósticos, riesgos, reglas,
-                recomendaciones, normativa, contenidos y flujos
-                conversacionales.
+                El informe contempla un modelo relacional para preguntas, opciones, escenarios, contenidos y recomendaciones. En la versión actual estos elementos se organizan en archivos de datos y módulos de código. La base de datos relacional corresponde al diseño previsto y no se presenta como una funcionalidad implementada.
               </p>
             </InfoCard>
 
@@ -875,7 +836,7 @@ export default function AcercaProyecto() {
         >
 
           <SectionHeader
-            eyebrow="INTERACCIÓN INTELIGENTE"
+            eyebrow="INTERACCIÓN GUIADA POR OPCIONES"
             number="09"
             title="Chatbot interactivo"
             icon="🤖"
@@ -903,10 +864,7 @@ export default function AcercaProyecto() {
               </p>
 
               <p>
-                El sistema contempla mecanismos de orientación,
-                educación, simulación y evaluación preventiva,
-                utilizando preguntas, opciones, reglas de decisión y
-                recomendaciones.
+                La interacción se realiza exclusivamente seleccionando opciones, sin escribir consultas ni aportar documentos personales. Los recorridos permiten solicitar orientación, aprender y practicar, o revisar hábitos digitales. Las respuestas proceden de contenidos y reglas definidos para el proyecto, sin generación abierta de texto.
               </p>
 
             </div>
@@ -931,18 +889,16 @@ export default function AcercaProyecto() {
               title="Educación y simulación"
             >
               <p>
-                Utiliza escenarios prácticos para promover el
-                aprendizaje activo y la retroalimentación.
+                Ofrece contenidos, preguntas de comprensión y simulaciones por etapas. La retroalimentación identifica si la elección es correcta, explica la respuesta adecuada y propone una acción de mejora sin culpabilizar a la persona.
               </p>
             </InfoCard>
 
             <InfoCard
               label="MÓDULO 03"
-              title="Evaluación de riesgo digital"
+              title="Revisión orientativa de hábitos digitales"
             >
               <p>
-                Analiza prácticas del usuario y genera
-                recomendaciones preventivas según sus respuestas.
+                Revisa cinco áreas mediante 25 preguntas: contraseñas, navegación, redes sociales, compras en línea y derechos digitales. Las recomendaciones se organizan por área. La puntuación es un criterio del prototipo basado en respuestas declaradas, no un diagnóstico ni una escala científicamente validada.
               </p>
             </InfoCard>
 
@@ -968,10 +924,7 @@ export default function AcercaProyecto() {
           />
 
           <p className="about-section-intro">
-            La plataforma se plantea con un enfoque ciudadano,
-            procurando que sus contenidos puedan ser comprendidos
-            por personas con diferentes niveles de conocimiento
-            tecnológico.
+            La población principal son personas usuarias de servicios digitales en Costa Rica, en actividades personales, educativas, laborales o comerciales. Los siguientes grupos son posibles beneficiarios; su inclusión no implica que hayan participado en la evaluación del proyecto.
           </p>
 
           <div className="about-grid-4">
@@ -1167,14 +1120,12 @@ export default function AcercaProyecto() {
           <SectionHeader
             eyebrow="PRODUCTOS Y EVIDENCIAS"
             number="13"
-            title="Resultados del proyecto"
+            title="Productos y estado actual"
             icon="📊"
           />
 
           <p className="about-section-intro">
-            El proyecto contempla productos académicos y tecnológicos
-            que permiten demostrar el avance desde la investigación
-            hasta la construcción y validación de la solución.
+            La plataforma dispone de contenidos educativos, una biblioteca de recursos y un chatbot guiado. Estos productos se distinguen del diseño de almacenamiento relacional y de la evaluación de usabilidad, utilidad y aceptación con participantes, cuyos resultados requieren evidencia académica específica.
           </p>
 
           <div className="about-results">
@@ -1205,10 +1156,9 @@ export default function AcercaProyecto() {
             <div className="about-result-row">
               <span>03</span>
               <div>
-                <h3>Modelo de base de datos</h3>
+                <h3>Modelo de datos previsto</h3>
                 <p>
-                  Estructuración de entidades y relaciones necesarias
-                  para administrar contenidos y procesos.
+                  Diseño de entidades y relaciones contemplado en el informe. El prototipo actual organiza sus contenidos en archivos y módulos de código, sin persistencia relacional implementada.
                 </p>
               </div>
             </div>
@@ -1240,8 +1190,7 @@ export default function AcercaProyecto() {
               <div>
                 <h3>Evaluación de la solución</h3>
                 <p>
-                  Pruebas y evaluación de la utilidad, funcionalidad
-                  y experiencia de interacción de la plataforma.
+                  Las verificaciones técnicas del código son distintas de la evaluación con participantes. No se atribuyen resultados de aceptación, utilidad o mejora del aprendizaje hasta documentar los instrumentos, la muestra y el análisis.
                 </p>
               </div>
             </div>
@@ -1413,7 +1362,7 @@ export default function AcercaProyecto() {
 
               <div>
                 <span>BACKEND</span>
-                <h3>Python</h3>
+                <h3>Python · FastAPI</h3>
 
                 <p>
                   Implementación de la lógica de negocio y
@@ -1430,11 +1379,10 @@ export default function AcercaProyecto() {
 
               <div>
                 <span>DATOS</span>
-                <h3>Base de datos relacional</h3>
+                <h3>Conocimiento estructurado</h3>
 
                 <p>
-                  Administración estructurada de información,
-                  contenidos, reglas y procesos del sistema.
+                  Archivos de datos y módulos con contenidos, preguntas, opciones y reglas. El modelo relacional figura como parte del diseño previsto en el informe.
                 </p>
               </div>
             </article>
@@ -1532,13 +1480,21 @@ export default function AcercaProyecto() {
             </h3>
 
             <p>
-              Universidad Nacional · Escuela de Informática
+              Universidad Nacional · Licenciatura en Informática con énfasis en Sistemas de Información
             </p>
 
           </div>
 
         </section>
 
+      <section id="about-17" className="about-content-section">
+        <SectionHeader eyebrow="FUNDAMENTACIÓN DOCUMENTAL" number="17" title="Referencias de apoyo" icon="📚" />
+        <p className="about-section-intro">La identidad, los objetivos y la metodología se sintetizan del borrador del informe final del TFG proporcionado por su autor (Chavarría Peraza, 2026). Las siguientes fuentes respaldan el contexto normativo y de gestión del riesgo; las características técnicas se describen según la implementación actual.</p>
+        <div className="bibliography-list">
+          <p className="apa-reference">Chavarría Peraza, J. E. (2026). <em>Diseño de una página web con chatbot interactivo para la orientación ciudadana en protección de datos personales en Costa Rica</em> [Borrador de informe final de Trabajo Final de Graduación, Universidad Nacional]. Documento proporcionado por el autor.</p>
+          {projectReferences.map(item => <ApaReference key={item.id} reference={{ ...item.reference, suffix: "" }} />)}
+        </div>
+      </section>
       </main>
 
     </div>
