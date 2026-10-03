@@ -1,3 +1,4 @@
+import ReadMore, { ReadingHint } from '../components/reading/ReadMore'
 import './ProtectionDataPage.css'
 
 /*
@@ -908,6 +909,7 @@ function SectionBlock({ block }) {
     <article className="protection-data__block">
       <h3>{block.title}</h3>
 
+      <ReadMore label={block.title} force={block.list?.length > 5} preview={!block.text && block.list ? block.list.slice(0, 3).join(" ") : undefined}>
       {block.text && <p>{block.text}</p>}
 
       {block.list && (
@@ -917,6 +919,7 @@ function SectionBlock({ block }) {
           ))}
         </ul>
       )}
+      </ReadMore>
     </article>
   )
 }
@@ -1009,7 +1012,7 @@ export default function ProtectionDataPage() {
               compartida
             </h2>
 
-            <p>
+            <ReadMore label="introducción al módulo"><p>
               La transformación digital ha incrementado la cantidad
               de información personal que se recopila, almacena,
               utiliza y comparte. Esta realidad exige comprender
@@ -1031,7 +1034,7 @@ export default function ProtectionDataPage() {
               experiencias internacionales y recomendaciones
               prácticas para facilitar una comprensión integral de
               la protección de datos personales.
-            </p>
+            </p></ReadMore>
           </div>
         </div>
       </section>
@@ -1077,6 +1080,7 @@ export default function ProtectionDataPage() {
           ===================================================== */}
 
       <div className="protection-data__content">
+        <ReadingHint />
         {sections.map(section => (
           <section
             key={section.id}
@@ -1103,9 +1107,9 @@ export default function ProtectionDataPage() {
               </div>
             </div>
 
-            <p className="protection-data__section-intro">
+            <ReadMore label={section.title}><p className="protection-data__section-intro">
               {section.intro}
-            </p>
+            </p></ReadMore>
 
             {/* BLOQUES EDUCATIVOS */}
 
@@ -1136,7 +1140,7 @@ export default function ProtectionDataPage() {
                     <div>
                       <h3>{country.name}</h3>
 
-                      <p>{country.text}</p>
+                      <ReadMore label={country.name}><p>{country.text}</p></ReadMore>
                     </div>
                   </article>
                 ))}
@@ -1146,9 +1150,9 @@ export default function ProtectionDataPage() {
             {/* REFERENCIAS APA */}
 
             {section.references && (
-              <ReferencesList
+              <ReadMore label="las referencias del módulo" preview="Consulta las fuentes académicas y normativas de este módulo, con sus referencias y enlaces completos." force><ReferencesList
                 references={section.references}
-              />
+              /></ReadMore>
             )}
           </section>
         ))}

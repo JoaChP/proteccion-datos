@@ -1,3 +1,4 @@
+import ReadMore, { ReadingHint } from '../components/reading/ReadMore'
 import { useEffect } from 'react'
 import './SecurityDigitalPage.css'
 
@@ -1330,7 +1331,7 @@ function Blocks({ blocks }) {
           key={`${block.title}-${index}`}
         >
           <h3>{block.title}</h3>
-          <p>{block.text}</p>
+          <ReadMore label={block.title}><p>{block.text}</p></ReadMore>
         </article>
       ))}
     </div>
@@ -1347,7 +1348,7 @@ function Principles({ principles }) {
         >
           <span>{item.number}</span>
           <h3>{item.title}</h3>
-          <p>{item.text}</p>
+          <ReadMore label={item.title}><p>{item.text}</p></ReadMore>
         </article>
       ))}
     </div>
@@ -1361,7 +1362,7 @@ function RiskFlow({ items }) {
         <div key={item.step}>
           <span>{item.step}</span>
           <strong>{item.title}</strong>
-          <p>{item.text}</p>
+          <ReadMore label={item.title}><p>{item.text}</p></ReadMore>
         </div>
       ))}
     </div>
@@ -1380,7 +1381,7 @@ function Frameworks({ frameworks }) {
 
           <h3>{item.title}</h3>
 
-          <p>{item.text}</p>
+          <ReadMore label={item.title}><p>{item.text}</p></ReadMore>
 
           <div>
             {item.tags.map((tag) => (
@@ -1400,7 +1401,7 @@ function Diagnostic({ items }) {
         <article key={`${item.title}-${index}`}>
           <span>{item.label}</span>
           <h3>{item.title}</h3>
-          <p>{item.text}</p>
+          <ReadMore label={item.title}><p>{item.text}</p></ReadMore>
         </article>
       ))}
     </div>
@@ -1414,7 +1415,7 @@ function Strategy({ items }) {
         <article key={item.label}>
           <span>{item.label}</span>
           <h3>{item.title}</h3>
-          <p>{item.text}</p>
+          <ReadMore label={item.title}><p>{item.text}</p></ReadMore>
         </article>
       ))}
     </div>
@@ -1457,7 +1458,7 @@ function Practice({ items }) {
         >
           <span>{item.label}</span>
           <h3>{item.title}</h3>
-          <p>{item.text}</p>
+          <ReadMore label={item.title}><p>{item.text}</p></ReadMore>
         </article>
       ))}
     </div>
@@ -1471,7 +1472,7 @@ function Application({ items }) {
         <article key={item.label}>
           <span>{item.label}</span>
           <h3>{item.title}</h3>
-          <p>{item.text}</p>
+          <ReadMore label={item.title}><p>{item.text}</p></ReadMore>
         </article>
       ))}
     </div>
@@ -1487,9 +1488,11 @@ function Analysis({ analysis }) {
     <div className="security-digital__analysis">
       <h3>{analysis.title}</h3>
 
+      <ReadMore label={analysis.title}>
       {analysis.paragraphs.map((paragraph, index) => (
         <p key={index}>{paragraph}</p>
       ))}
+      </ReadMore>
     </div>
   )
 }
@@ -1551,7 +1554,7 @@ export default function SecurityDigitalPage() {
               La seguridad digital es una responsabilidad compartida
             </h2>
 
-            <p>
+            <ReadMore label="introducción al módulo"><p>
               La transformación digital ha incrementado la dependencia
               de sistemas, redes, aplicaciones y servicios tecnológicos.
               Como consecuencia, también ha aumentado la exposición de
@@ -1578,7 +1581,7 @@ export default function SecurityDigitalPage() {
               fundamentos académicos y buenas prácticas internacionales
               para facilitar una comprensión integral de la seguridad
               digital (MICITT, 2023).
-            </p>
+            </p></ReadMore>
           </div>
         </div>
       </section>
@@ -1624,6 +1627,7 @@ export default function SecurityDigitalPage() {
           ===================================================== */}
 
       <div className="security-digital__content">
+        <ReadingHint />
         {sections.map((section) => {
           if (section.id === 'referencias') {
             return (
@@ -1634,11 +1638,11 @@ export default function SecurityDigitalPage() {
               >
                 <SectionHeading section={section} />
 
-                <p className="security-digital__section-intro">
+                <ReadMore label={section.title}><p className="security-digital__section-intro">
                   {section.intro}
-                </p>
+                </p></ReadMore>
 
-<div className="security-digital__reference-list">
+<ReadMore label="las referencias de seguridad digital" preview="Consulta las fuentes completas que respaldan este módulo y sus enlaces de consulta." force><div className="security-digital__reference-list">
   {section.references.map((reference, index) => (
     <div
       className="security-digital__reference"
@@ -1669,7 +1673,7 @@ export default function SecurityDigitalPage() {
       </p>
     </div>
   ))}
-</div>
+</div></ReadMore>
               </section>
             )
           }
@@ -1682,9 +1686,9 @@ export default function SecurityDigitalPage() {
             >
               <SectionHeading section={section} />
 
-              <p className="security-digital__section-intro">
+              <ReadMore label={section.title}><p className="security-digital__section-intro">
                 {section.intro}
-              </p>
+              </p></ReadMore>
 
               {section.blocks && (
                 <Blocks blocks={section.blocks} />

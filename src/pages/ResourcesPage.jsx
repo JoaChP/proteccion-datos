@@ -1,9 +1,10 @@
 import { useState } from 'react'
-import { BookOpen, FileText, PlayCircle, ArrowUpRight, Search, Download, ArrowRight } from 'lucide-react'
+import { BookOpen, FileText, PlayCircle, ArrowUpRight, Search, Download } from 'lucide-react'
 import { resources } from '../data/resources'
 import './ResourcesPage.css'
 import ResourceBibliography, { ApaReference } from '../components/sections/ResourceBibliography'
 import ResourceSidebar from '../components/layout/ResourceSidebar'
+import ReadMore, { ReadingHint } from '../components/reading/ReadMore'
 
 const types = ['Todos', ...new Set(resources.map(resource => resource.type))]
 const normalize = value => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
@@ -25,16 +26,22 @@ export default function ResourcesPage() {
     <ResourceSidebar />
     <div className="resources-main">
     <header className="resources-hero">
-      <div className="container">
-        <span className="resources-eyebrow"><BookOpen size={17} aria-hidden="true" /> BIBLIOTECA PARA LA CIUDADANÍA</span>
+      <div className="resources-hero-content">
+        <span className="resources-hero-eyebrow">EDUCACIÓN CIUDADANA · DOCUMENTACIÓN · APRENDIZAJE DIGITAL</span>
         <h1>Recursos Educativos</h1>
-        <p>Documentos, videos y páginas de consulta.</p>
-        <div className="resources-hero-description">Documentos, videos y herramientas para reconocer riesgos digitales y tomar decisiones informadas en Costa Rica.</div>
-        <a className="resources-button" href="#biblioteca">Explorar la biblioteca <ArrowRight size={18} aria-hidden="true" /></a>
+        <p>Biblioteca de documentos, videos y páginas de consulta sobre protección de datos personales y seguridad digital, con especial atención al contexto costarricense y a referentes internacionales.</p>
+        <div className="resources-hero-tags" aria-label="Contenidos de la biblioteca">
+          <span>🇨🇷 Costa Rica</span>
+          <span>📄 Documentos e informes</span>
+          <span>🎬 Videos educativos</span>
+          <span>🌐 Fuentes institucionales</span>
+          <span>📚 Referencias APA 7</span>
+        </div>
       </div>
     </header>
 
     <div className="container resources-content">
+      <ReadingHint />
       <section id="informes-una" className="resources-una" aria-labelledby="una-heading">
         <span className="resources-eyebrow">DOCUMENTACIÓN NACIONAL · LABCIBE–UNA</span><h2 id="una-heading">Estado de la ciberseguridad en Costa Rica</h2>
         <p>Las tres ediciones del informe, con sus autores y años de publicación. Cada enlace abre el documento o su ficha de repositorio en una nueva pestaña.</p>
@@ -47,7 +54,7 @@ export default function ResourcesPage() {
       <section id="biblioteca" aria-labelledby="biblioteca-heading">
         <div className="resources-section-heading"><div><span className="resources-eyebrow">APRENDE A TU RITMO</span><h2 id="biblioteca-heading">Biblioteca de recursos</h2></div><span>{resources.length} recursos · Español e inglés</span></div>
         <p>Selección guiada por las referencias del proyecto: documentos oficiales, investigación académica, tutoriales y contexto periodístico. Cada ficha indica su origen, idioma y utilidad. Los procedimientos legales y canales de atención extranjeros corresponden a sus países de origen.</p>
-        <div className="resources-reading-guide"><h3>¿Qué material elegir?</h3><p><strong>Para empezar:</strong> explora los videos, las guías de privacidad y las páginas institucionales de Costa Rica. <strong>Para profundizar:</strong> consulta los informes de UNA, los marcos de NIST y los estudios internacionales.</p><p>Revisa siempre el período de cada informe: una noticia de 2022 o una encuesta de 2023 sirve como antecedente, pero no describe por sí sola la situación actual.</p></div>
+        <div className="resources-reading-guide"><h3>¿Qué material elegir?</h3><ReadMore label="cómo elegir un recurso"><p><strong>Para empezar:</strong> explora los videos, las guías de privacidad y las páginas institucionales de Costa Rica. <strong>Para profundizar:</strong> consulta los informes de UNA, los marcos de NIST y los estudios internacionales.</p><p>Revisa siempre el período de cada informe: una noticia de 2022 o una encuesta de 2023 sirve como antecedente, pero no describe por sí sola la situación actual.</p></ReadMore></div>
         <div className="resources-controls">
           <div className="resources-search"><label htmlFor="resource-search">Buscar un recurso</label><div><Search size={18} aria-hidden="true" /><input id="resource-search" type="search" placeholder="Privacidad, contraseñas, Ley 8968…" value={query} onChange={event => setQuery(event.target.value)} /></div></div>
           <div><label htmlFor="resource-topic">Tema</label><select id="resource-topic" value={topic} onChange={event => setTopic(event.target.value)}><option>Todos los temas</option>{[...new Set(resources.map(resource => resource.topic))].map(item => <option key={item}>{item}</option>)}</select></div>
@@ -62,10 +69,13 @@ export default function ResourcesPage() {
           const action = resource.action || (resource.local ? 'Abrir ficha' : resource.type === 'Videos' ? 'Ver colección de videos' : 'Consultar recurso')
           return <article className="resource-card" key={resource.id}>
             <div className="resource-card-top"><Icon size={25} aria-hidden="true" /><span>{resource.type}</span></div>
-            <p className="resource-meta">{resource.scope}</p><h3>{resource.title}</h3><p>{resource.description}</p>
+            <p className="resource-meta">{resource.scope}</p><h3>{resource.title}</h3>
+            <ReadMore label={resource.title} preview={resource.description} limit={160} force>
+            <p>{resource.description}</p>
             {resource.alignment && <details className="resource-alignment"><summary>Relación con la documentación y Costa Rica</summary><p>{resource.alignment}</p><p>{resource.applicability}</p></details>}
             <div className="resource-details"><strong>{resource.source}</strong><span>{resource.format}</span><span>{resource.level}</span></div>
             <details className="resource-alignment"><summary>Referencia APA 7</summary><ApaReference reference={resource.reference} /></details>
+            </ReadMore>
             <a href={resource.url} target="_blank" rel="noopener noreferrer" aria-label={`${action}: ${resource.title} (nueva pestaña)`}>{action} <ArrowUpRight size={18} aria-hidden="true" /></a>
             {resource.local && <a href={resource.url} download="lista-proteccion-digital.html"><Download size={16} aria-hidden="true" /> Descargar ficha HTML</a>}
           </article>

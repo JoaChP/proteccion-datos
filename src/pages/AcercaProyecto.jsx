@@ -1,3 +1,4 @@
+import ReadMore, { ReadingHint } from '../components/reading/ReadMore'
 import React from "react";
 import "./AcercaProyecto.css";
 
@@ -120,7 +121,7 @@ function InfoCard({ label, title, children, className = "" }) {
 
       {title && <h3>{title}</h3>}
 
-      <div className="about-card-content">{children}</div>
+      <div className="about-card-content"><ReadMore label={title || label} limit={150}>{children}</ReadMore></div>
     </article>
   );
 }
@@ -132,7 +133,7 @@ function ObjectiveCard({ number, title, children }) {
 
       <div className="about-objective-body">
         <h3>{title}</h3>
-        <p>{children}</p>
+        <ReadMore label={title} limit={150}><p>{children}</p></ReadMore>
       </div>
     </article>
   );
@@ -145,7 +146,7 @@ function ProcessStep({ number, title, children }) {
 
       <div className="about-process-body">
         <h3>{title}</h3>
-        <p>{children}</p>
+        <ReadMore label={title} limit={150}><p>{children}</p></ReadMore>
       </div>
     </article>
   );
@@ -259,6 +260,7 @@ export default function AcercaProyecto() {
             01. PRESENTACIÓN
         ======================================================= */}
 
+        <ReadingHint />
         <section
           id="about-01"
           className="about-content-section"

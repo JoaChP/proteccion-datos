@@ -1,3 +1,4 @@
+import ReadMore from '../reading/ReadMore'
 import { resources } from '../../data/resources'
 import { referenceDate, referenceText } from '../../data/resourceReferences'
 
@@ -31,6 +32,6 @@ export default function ResourceBibliography() {
     <p>Referencias de los {resources.length} recursos del catálogo, ordenadas alfabéticamente. El año corresponde a la publicación y puede diferir del período analizado. «s. f.» indica que no se pudo confirmar la fecha en la fuente consultada; no se ha usado el año de consulta como fecha de publicación.</p>
     <button className="resources-button" onClick={downloadReferences}>Descargar referencias (.txt)</button>
     <p className="resources-note">La versión en pantalla conserva las cursivas y la sangría francesa. El archivo de texto conserva los datos bibliográficos, pero no el formato tipográfico. Las letras a, b… distinguen obras del mismo autor y año dentro de esta biblioteca.</p>
-    <div className="bibliography-list">{ordered.map(item => <ApaReference key={item.id} reference={item.reference} />)}</div>
+    <ReadMore label="las referencias bibliográficas" preview="Consulta las referencias completas de la biblioteca, ordenadas alfabéticamente y con enlaces a sus fuentes originales." force><div className="bibliography-list">{ordered.map(item => <ApaReference key={item.id} reference={item.reference} />)}</div></ReadMore>
   </section>
 }
