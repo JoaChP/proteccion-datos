@@ -74,7 +74,7 @@ export default function ChatbotWidget({ standalone = false }) {
 
   const decision = !loading && suggestions.length > 0 && <section className="chatbot-decision" aria-label="Siguiente paso"><h2>{simulation?.phase === 'decision' ? '¿Qué harías en esta situación?' : 'Selecciona cómo continuar'}</h2><div className="chatbot-widget__options" role="group" aria-label="Opciones para continuar">{suggestions.map((opt, index) => <button key={`${opt.value}-${index}`} className="chatbot-option" onClick={() => sendMessage(opt.value, opt.display || opt.label)}><span className="chat-option-number" aria-hidden="true">{/^[ABC]\)/.test(opt.value) ? opt.value[0] : String(index + 1).padStart(2, '0')}</span><span>{opt.label.replace(/^[ABC]\)\s*/, '')}</span><ChevronRight size={18} aria-hidden="true" /></button>)}</div></section>
 
-  return <section className={`chatbot-widget${standalone ? ' chatbot-widget--standalone' : ''}${minimized ? ' chatbot-widget--minimized' : ''}`} aria-label="Chatbot de orientación">
+  return <section className={`chatbot-widget${standalone ? ' chatbot-widget--standalone' : ''}${messages.length === 0 ? ' chatbot-widget--welcome' : ''}${minimized ? ' chatbot-widget--minimized' : ''}`} aria-label="Chatbot de orientación">
     <div className="chatbot-widget__header">
       <div className="chatbot-widget__header-info">
         <div className="chatbot-widget__avatar"><Bot size={24} aria-hidden="true" /></div>
@@ -97,7 +97,7 @@ export default function ChatbotWidget({ standalone = false }) {
         <span className="chatbot-route-panel__foot">Costa Rica · Privacidad · Aprendizaje</span>
       </aside>}
     <div className="chatbot-widget__body">
-      {route && <div className="chatbot-breadcrumb"><span>{route}</span><span>{simulation ? 'Práctica guiada' : progress ? `Pregunta ${progress.current} de ${progress.total}` : 'Recorrido guiado'}</span></div>}
+      {route && <div className="chatbot-breadcrumb"><span>{route}</span><span>{simulation ? 'Práctica guiada' : progress ? `Pregunta ${progress.current} de ${progress.total}` : 'Plan de orientación'}</span></div>}
       {simulation && <div className="chat-simulation" aria-label="Progreso de la simulación"><strong>{simulation.title}</strong><ol>{['Reconocer', 'Verificar', 'Actuar', 'Dar seguimiento'].map((label, index) => <li key={label} aria-current={simulation.current === index + 1 ? 'step' : undefined} className={index + 1 < simulation.current || simulation.phase === 'complete' ? 'is-complete' : ''}><span>{index + 1}</span>{label}</li>)}</ol><p>{simulation.phase === 'complete' ? 'Recorrido completado · Revisa tus decisiones abajo' : simulation.phase === 'feedback' ? 'Lee la explicación y continúa cuando estés listo.' : `Paso ${simulation.current} de ${simulation.total} · Elige una respuesta; no necesitas escribir.`}</p></div>}
       {feedback && <div className={`chat-feedback ${feedback.correct ? 'chat-feedback--correct' : 'chat-feedback--improve'}`} role="status"><strong>{feedback.correct ? '✓ Respuesta correcta' : '↗ Respuesta incorrecta · Puedes mejorar'}</strong><p><b>La opción correcta es:</b> {feedback.answer}</p></div>}
       <div className="chatbot-widget__messages" ref={scrollRef}>
@@ -106,14 +106,16 @@ export default function ChatbotWidget({ standalone = false }) {
           <span className="chat-welcome-label">PROYECTO ACADÉMICO · COSTA RICA</span>
           <h2>Una decisión informada empieza aquí.</h2>
           <p>No necesitas conocimientos técnicos. Elige qué necesitas hoy; te acompañamos paso a paso.</p>
-          <ol className="chatbot-how"><li>Elige un recorrido</li><li>Selecciona una opción</li><li>Comprende el siguiente paso</li></ol>
+          <div className="chatbot-main-instructions">
+            <ol><li>Elige un recorrido</li><li>Selecciona una opción</li><li>Comprende el siguiente paso</li></ol>
+          </div>
           <div className="chatbot-starters">{starters.map(({ title, description, value, icon: Icon }) => <button key={value} onClick={() => sendMessage(value, title)} className="chatbot-starter"><Icon size={22} aria-hidden="true" /><span><strong>{title}</strong><span>{description}</span></span><ChevronRight size={18} aria-hidden="true" /></button>)}</div>
         </div>}
         <div className="chatbot-conversation" role="log" aria-live="polite" aria-label="Mensajes del chatbot" aria-busy={loading}>
           {messages.map((msg, index) => <article key={index} className={`chatbot-msg chatbot-msg--${msg.from}`}>
             <span className="chatbot-msg__author">{msg.from === 'user' ? 'Tú' : 'Asistente'}</span>
             {msg.from === 'user' ? <p className="chatbot-msg__text">{msg.text}</p> : index === messages.length - 1 ? <ChatAnswer message={msg} /> : <details className="chatbot-previous"><summary>Ver respuesta anterior</summary><ChatAnswer message={msg} /></details>}
-            {msg.sources?.length > 0 && <details className="chatbot-sources"><summary>Referencias de apoyo · APA 7</summary><ul>{msg.sources.map((source, i) => <li key={i}><a href={source.url} target="_blank" rel="noopener noreferrer">{source.title}<span className="sr-only"> (nueva pestaña)</span></a></li>)}</ul></details>}
+            {msg.sources?.length > 0 && <details className="chatbot-sources"><summary>Referencias de apoyo · APA 7</summary><p className="chatbot-source-note">Fuentes seleccionadas para este contenido. Consulta el documento original para conocer su alcance; no es una búsqueda en tiempo real.</p><ul>{msg.sources.map((source, i) => <li key={i}><a href={source.url} target="_blank" rel="noopener noreferrer">{source.title}<span className="sr-only"> (nueva pestaña)</span></a></li>)}</ul></details>}
             <span className="chatbot-msg__time">{msg.time}</span>
           </article>)}
           {loading && <p className="chatbot-processing" role="status">Preparando respuesta…</p>}

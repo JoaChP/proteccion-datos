@@ -1573,3 +1573,36 @@
 .about-project-page .apa-reference { padding-left: 1.5rem; text-indent: -1.5rem; font-size: var(--text-sm); line-height: 1.8; overflow-wrap: anywhere; color: var(--text-primary); }
 .about-project-page .apa-reference a { color: var(--text-secondary); text-decoration: underline; }
 .about-project-page .bibliography-list { margin-top: 1.5rem; }
+
+/* Objetivos: lectura completa y jerarquía numérica por sección. */
+.about-objective-main, .about-objective-card { grid-template-columns: 64px minmax(0, 1fr); align-items: start; gap: 20px; padding: 28px; }
+.about-objective-main-number, .about-objective-number { display: flex; align-items: center; justify-content: center; width: 56px; min-height: 48px; border-radius: 12px; background: var(--about-primary-soft); border: 1px solid var(--about-border); font-size: 20px; font-weight: 750; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.about-objective-main h3 { max-width: 75ch; font-size: 18px; font-weight: 500; line-height: 1.8; }
+.about-objective-body h3 { font-size: 18px; font-weight: 700; margin-bottom: 12px; }
+.about-objective-body p { max-width: 75ch; font-size: 16px; line-height: 1.8; }
+.about-objectives-list { gap: 20px; }
+@media (max-width: 640px) {
+  .about-objective-main, .about-objective-card { grid-template-columns: 1fr; gap: 16px; padding: 20px; }
+  .about-objective-main h3 { font-size: 16px; }
+}
+
+/* Distribución por filas según el ancho real del contenido. */
+.about-project-main { container-type: inline-size; }
+.about-content-section { max-width: 1160px; margin-inline: auto; }
+.about-objectives-list, .about-results { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; align-items: stretch; }
+.about-results { border: 0; border-radius: 0; overflow: visible; }
+.about-result-row, .about-result-row:last-child { border: 1px solid var(--about-border); border-radius: 14px; }
+.about-result-row { grid-template-columns: 36px minmax(0, 1fr); gap: 16px; padding: 24px; }
+.about-result-row p { font-size: 16px; line-height: 1.8; }
+.about-objective-card { grid-template-columns: minmax(0, 1fr); gap: 16px; align-content: start; }
+.about-objective-body { min-width: 0; }
+.about-objective-body p { max-width: none; }
+.about-project-main > .reading-hint { width: calc(100% - 48px); max-width: 1160px; margin: 32px auto; box-sizing: border-box; }
+@container (min-width: 800px) {
+  .about-objectives-list, .about-results { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .about-objective-card:last-child:nth-child(odd) { grid-column: 1 / -1; display: grid; grid-template-columns: 64px minmax(0, 1fr); align-items: start; }
+}
+@media (max-width: 640px) {
+  .about-result-row { padding: 20px; }
+  .about-project-main > .reading-hint { width: calc(100% - 32px); margin: 24px auto; }
+}

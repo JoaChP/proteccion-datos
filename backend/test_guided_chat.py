@@ -80,7 +80,18 @@ class GuidedChatTests(unittest.TestCase):
                 answer_message('Orientación ante una situación', 'test')
                 question = answer_message(topic['label'], 'test')
                 self.assertIn(choice, question.suggestions)
-                result = answer_message(choice, 'test')
+                follow_up = answer_message(choice, 'test')
+                self.assertEqual(SESSIONS['test']['mode'], 'guidance-context')
+                self.assertEqual(follow_up.progress, {'current': 2, 'total': 2})
+                for context in follow_up.suggestions[:3]:
+                    answer_message('Orientación ante una situación', 'test')
+                    answer_message(topic['label'], 'test')
+                    answer_message(choice, 'test')
+                    result = answer_message(context, 'test')
+                    self.assertIn('PRIMERO', result.reply)
+                    self.assertIn('DESPUÉS', result.reply)
+                    self.assertTrue(result.sources)
+                    self.assertNotIn('test', SESSIONS)
                 self.assertGreater(len(result.reply), 100)
                 self.assertNotIn('test', SESSIONS)
                 self.assertIn('🏠 Volver al inicio', result.suggestions)
@@ -156,8 +167,25 @@ class GuidedChatTests(unittest.TestCase):
             self.assertIn(level, result.reply)
             self.assertNotIn('test', SESSIONS)
 
+    def test_personal_data_request_has_three_contextual_plans(self):
+        for index in range(3):
+            result = answer_message('Me solicitaron datos personales', 'test')
+            result = answer_message(result.suggestions[index], 'test')
+            self.assertIn('PRIMERO', result.reply)
+            self.assertIn('artículo', result.reply)
+            self.assertTrue(result.sources)
+            self.assertNotIn('test', SESSIONS)
+
+    def test_repeat_simulation_starts_a_fresh_attempt(self):
+        scenario = next(iter(SIMULATIONS.values()))
+        SESSIONS['test'] = {'mode': 'simulation-feedback'}
+        result = answer_message(f"Repetir: {scenario['label']}", 'test')
+        self.assertEqual(result.simulation['current'], 1)
+        self.assertEqual(SESSIONS['test']['decisions'], [])
+        self.assertEqual(result.suggestions[:3], scenario['steps'][0]['options'])
+
     def test_restart_can_exit_every_active_state(self):
-        for mode in ['guidance-menu', 'guidance-question', 'education-menu', 'simulation-menu', 'simulation-answer', 'simulation-feedback', 'assessment']:
+        for mode in ['guidance-menu', 'guidance-question', 'guidance-context', 'learning-content', 'learning-check', 'education-menu', 'simulation-menu', 'simulation-answer', 'simulation-feedback', 'assessment']:
             SESSIONS['test'] = {'mode': mode}
             result = answer_message('🏠 Volver al inicio', 'test')
             self.assertNotIn('test', SESSIONS)

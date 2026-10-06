@@ -66,3 +66,11 @@ def assessment_report(questions, answers):
         level = 'Bajo' if percentage <= 33 else 'Moderado' if percentage <= 66 else 'Alto'
         areas.append({"area": name, "percentage": percentage, "level": level, "action": action if score else "Mantén estas prácticas y revísalas periódicamente.", "url": url})
     return sorted(areas, key=lambda area: area['percentage'], reverse=True)
+
+
+PLAIN_TOPICS['law']['content'] += (
+    "\n\nFUNDAMENTO · LEY N.º 8968\n"
+    "Artículo 4: autodeterminación informativa. Artículo 5: información previa y consentimiento, con excepciones. "
+    "Artículo 6: calidad y finalidad. Artículo 7: acceso, rectificación y supresión según corresponda. "
+    "Consulta el texto original y el procedimiento oficial para tu situación."
+)

@@ -4,7 +4,8 @@ function blocks(text) {
   const parsed = text.split(/\n\s*\n/).filter(Boolean).map(block => {
     const [first, ...rest] = block.split('\n')
     const clean = first.replace(/[^\p{L}\p{N}\s¿?.,:–-]/gu, '').trim()
-    const heading = clean.length > 4 && clean.length < 100 && /\p{L}/u.test(clean) && clean === clean.toLocaleUpperCase('es')
+    const actionHeading = /^(PRIMERO|DESPUÉS|PARA LA PRÓXIMA VEZ|TE ACOMPAÑAMOS|TU SITUACIÓN)/.test(clean)
+    const heading = actionHeading || clean.length > 4 && clean.length < 100 && /\p{L}/u.test(clean) && clean === clean.toLocaleUpperCase('es')
     return { heading: heading ? clean : null, body: heading ? rest.join('\n') : block }
   })
   return parsed.reduce((result, block) => {
@@ -15,11 +16,20 @@ function blocks(text) {
   }, [])
 }
 
+function AnswerBody({ text }) {
+  const lines = text.split('\n').filter(Boolean)
+  if (lines.length > 1 && lines.every(line => /^(?:[•-]|\d+[.)])\s/.test(line))) {
+    return <ul>{lines.map((line, index) => <li key={index}>{line.replace(/^(?:[•-]|\d+[.)])\s/, '')}</li>)}</ul>
+  }
+  return <p>{text}</p>
+}
+
 export default function ChatAnswer({ message }) {
   return <div className="chat-answer">
     {blocks(message.text).map((block, index) => <section className="chat-answer__section" key={index}>
-      {block.heading && <h3>{block.heading}</h3>}
-      {block.body && <p>{block.body}</p>}
+      {index > 1 && block.body.length > 350 ? <details className="chat-answer__details">
+        <summary>{block.heading || 'Ampliar explicación'}</summary><AnswerBody text={block.body} />
+      </details> : <>{block.heading && <h3>{block.heading}</h3>}{block.body && <AnswerBody text={block.body} />}</>}
     </section>)}
     {message.areas?.length > 0 && <section className="chat-area-report" aria-label="Plan personal por área">
       <h3>Tu plan de mejora por área</h3>

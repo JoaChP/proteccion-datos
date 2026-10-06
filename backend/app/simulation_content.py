@@ -1,5 +1,5 @@
 """Guided four-stage exercises: recognize, verify, act and follow up."""
-from .chat_sources import PRIVACY, LAW, PRODHAB
+from .chat_sources import PRIVACY, LAW, PRODHAB, OIJ
 
 def step(title, scene, question, alternatives, correct, explanations, consequence):
     return dict(title=title, scene=scene, question=question,
@@ -32,6 +32,20 @@ SIMULATIONS = {
         step('Conservar evidencia y buscar apoyo', 'Ya atendiste la exposición de la tarjeta. Quieres saber qué puedes conservar.', '¿Qué eliges?', ['Borrar todos los mensajes', 'Guardar mensajes y comprobantes de forma privada y consultar canales oficiales', 'Publicar documentos del remitente y los míos'], 'B', ['Borrar puede dificultar reconstruir lo ocurrido.', 'Conserva la información y consulta al OIJ si necesitas orientación sobre un posible delito.', 'La publicación puede exponer datos propios y de otras personas.'], 'El asistente no presenta denuncias ni determina que ocurrió un delito.'),
     ]),
 }
+
+
+SIMULATIONS['shopping'] = dict(label='Compra y promoción sospechosa', goal='Verificar una oferta y proteger tus datos al comprar.', sources=[PRIVACY, OIJ], steps=[
+    step('Reconocer señales', 'Una tienda anuncia un teléfono muy barato. Exige pagar hoy y enviar una fotografía de tu tarjeta.', '¿Qué te hace detenerte?', ['La presión y la solicitud de la fotografía', 'Que tenga muchas imágenes', 'Que aparezca un candado'], 'A', ['La combinación exige verificar antes de pagar o entregar datos.', 'Las imágenes pueden copiarse.', 'HTTPS no acredita la identidad del comercio.'], 'Todavía puedes detener la compra sin entregar información.'),
+    step('Verificar al comercio', 'Quieres confirmar quién vende y cuáles son las condiciones.', '¿Cómo verificas?', ['Solo preguntas al contacto del anuncio', 'Buscas por tu cuenta identidad, contacto oficial y condiciones', 'Confías en comentarios positivos'], 'B', ['El mismo contacto no es una verificación independiente.', 'Comprueba identidad, condiciones y canales de contacto antes de decidir.', 'Los comentarios pueden ser manipulados.'], 'Si no puedes comprobar al vendedor, no continúes.'),
+    step('Elegir cómo actuar', 'El comercio sigue sin identificarse y exige el pago.', '¿Qué decisión protege mejor tus datos?', ['Enviar la tarjeta para reservar', 'Pagar una cantidad pequeña para probar', 'Detener la compra y buscar un comercio verificable'], 'C', ['Una fotografía puede exponer datos financieros.', 'Una prueba también puede causar pérdida o exposición.', 'No necesitas completar una operación que no puedes verificar.'], 'Si ya pagaste o compartiste datos financieros, contacta al emisor por su canal oficial.'),
+    step('Dar seguimiento', 'Quieres conservar lo ocurrido y evitar nuevas exposiciones.', '¿Qué haces?', ['Guardar evidencia privada y reportar el anuncio', 'Publicar tu tarjeta para advertir', 'Enviar más documentos para cancelar'], 'A', ['Conserva mensajes y comprobantes sin divulgar datos personales.', 'Advertir no requiere publicar información financiera.', 'Entregar más información puede ampliar la exposición.'], 'Para un posible delito consulta los canales oficiales del OIJ; el ejercicio no confirma fraude.')
+])
+SIMULATIONS['credentials'] = dict(label='Contraseñas y protección del acceso', goal='Proteger cuentas ante reutilización y solicitudes de códigos.', sources=[PRIVACY], steps=[
+    step('Reconocer la reutilización', 'Usas la misma contraseña en tu correo y una tienda que anuncia una exposición de credenciales.', '¿Qué debes considerar?', ['Solo importa la tienda', 'La reutilización puede afectar otras cuentas', 'No hay riesgo si la contraseña es larga'], 'B', ['Las mismas credenciales pueden probarse en otros servicios.', 'Protege también las cuentas donde reutilizaste esa credencial.', 'La longitud no elimina el efecto de reutilizar una credencial expuesta.'], 'No significa que todas las cuentas hayan sido comprometidas.'),
+    step('Proteger las cuentas', 'Accedes al servicio por su aplicación oficial.', '¿Qué medida eliges?', ['Una contraseña única y verificación en dos pasos', 'La misma contraseña con un número más', 'Enviar tu contraseña al soporte por chat'], 'A', ['Una credencial única reduce el alcance de una exposición; añade verificación en dos pasos.', 'Una variación predecible no ofrece una separación adecuada.', 'No entregues contraseñas a terceros.'], 'Guarda los medios de recuperación de forma segura.'),
+    step('Decidir sobre una solicitud', 'Recibes una solicitud de aprobación de acceso que no iniciaste.', '¿Qué haces?', ['Aprobar para que deje de aparecer', 'Compartir el código con quien llama', 'Rechazarla y revisar la actividad desde el servicio oficial'], 'C', ['Aprobar puede autorizar el acceso de otra persona.', 'Un código puede permitir acceso; no lo compartas.', 'No autorices accesos que no iniciaste y revisa la actividad.'], 'Una solicitud inesperada merece revisión, pero por sí sola no confirma una intrusión.'),
+    step('Revisar el acceso', 'Quieres comprobar que las medidas siguen activas.', '¿Qué revisas?', ['Solo la foto del perfil', 'Sesiones, medios de recuperación y autenticación', 'Publicar los códigos de recuperación'], 'B', ['La foto no informa sobre sesiones ni autenticación.', 'Revisa accesos y recuperación; utiliza el cierre de sesiones desconocidas que ofrece el proveedor.', 'Los códigos deben conservarse de forma privada.'], 'Si pierdes acceso utiliza la recuperación oficial del proveedor.')
+])
 
 def stage_reply(scenario, index, previous=None):
     item = scenario['steps'][index]

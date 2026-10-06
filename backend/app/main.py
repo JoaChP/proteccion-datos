@@ -12,6 +12,7 @@ import json
 from fastapi import FastAPI, Query, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
+from .guidance_content import FOLLOW_UPS, action_plan, guidance_sources
 from .chat_sources import supporting_sources
 from .learning_content import EXTENDED_TOPICS, PLAIN_TOPICS, LEARNING_CHECKS, assessment_report
 
@@ -1373,7 +1374,7 @@ def guidance_menu_reply() -> ChatReply:
             "No compartas contraseñas, PIN, códigos de autenticación, "
             "números completos de tarjeta ni otra información confidencial."
         ),
-        [item["label"] for item in GUIDANCE.values()] + ["Mis derechos y denuncias", "🏠 Volver al inicio"],
+        [item["label"] for item in GUIDANCE.values()] + ["Me solicitaron datos personales", "Mis derechos y denuncias", "🏠 Volver al inicio"],
     )
 
 
@@ -1620,6 +1621,23 @@ def answer_message(message: str, session_id: str) -> ChatReply:
         SESSIONS[session_id] = {"mode": "assessment", "index": 0, "score": 0, "answers": []}
         return assessment_question(session_id)
 
+    if text == normalize("Me solicitaron datos personales"):
+        SESSIONS[session_id] = {"mode": "guidance-context", "topic": "solicitud", "choice": "Solicitud de datos personales"}
+        question, options, _ = FOLLOW_UPS["solicitud"]
+        return ChatReply(question, options + ["🏠 Volver al inicio"], sources=guidance_sources("solicitud"))
+
+    retry_topic = next((key for key, topic in EDUCATION_TOPICS.items() if text == normalize(f"Repasar: {topic['label']}")), None)
+    if retry_topic:
+        topic = EDUCATION_TOPICS[retry_topic]
+        SESSIONS[session_id] = {"mode": "learning-content", "topic": retry_topic}
+        return ChatReply(f"{topic['title']}\n\n{topic['content']}", ["Comprobar lo aprendido", "📚 Elegir otro tema", "🏠 Volver al inicio"], sources=topic.get("sources", []))
+
+    repeat_simulation = next((key for key, scenario in SIMULATIONS.items() if text == normalize(f"Repetir: {scenario['label']}")), None)
+    if repeat_simulation:
+        scenario = SIMULATIONS[repeat_simulation]
+        SESSIONS[session_id] = {'mode': 'simulation-answer', 'scenario': repeat_simulation, 'step': 0, 'decisions': []}
+        return ChatReply(stage_reply(scenario, 0), scenario['steps'][0]['options'] + ['Necesito una pista'], sources=scenario['sources'], simulation={'title': scenario['label'], 'current': 1, 'total': 4, 'phase': 'decision'})
+
     state = SESSIONS.get(session_id)
 
     if state and state['mode'] == 'learning-content' and text == normalize('Comprobar lo aprendido'):
@@ -1638,7 +1656,7 @@ def answer_message(message: str, session_id: str) -> ChatReply:
         support = '¡Bien! Identificaste el criterio que ayuda a proteger tus datos. Ahora puedes practicar cómo aplicarlo.' if correct else 'Gracias por intentarlo. Esta situación puede generar dudas. Puedes aprender de esta elección sin exponerte a un riesgo real.'
         topic = EDUCATION_TOPICS[state['topic']]
         SESSIONS.pop(session_id, None)
-        return ChatReply(f"{title}\n{support}\n\nTU RESPUESTA\n{quiz['options'][index]}\n\nRESPUESTA CORRECTA Y POR QUÉ\n{correct_option}\n{quiz['explanation']}\n\nPARA PROTEGER TUS DATOS\n{topic['content'].split('APLICA LO APRENDIDO')[-1].strip()}\n\nSIGUIENTE PASO\nPractica este criterio en una simulación o vuelve a revisar otro tema a tu ritmo.", ['🎯 Hacer una simulación', '📚 Elegir otro tema', '🏠 Volver al inicio'], sources=topic.get('sources', []), feedback={'correct': correct, 'selected': quiz['options'][index], 'answer': correct_option, 'support': support})
+        return ChatReply(f"{title}\n{support}\n\nTU RESPUESTA\n{quiz['options'][index]}\n\nRESPUESTA CORRECTA Y POR QUÉ\n{correct_option}\n{quiz['explanation']}\n\nPARA PROTEGER TUS DATOS\n{topic['content'].split('APLICA LO APRENDIDO')[-1].strip()}\n\nSIGUIENTE PASO\nPractica este criterio en una simulación o vuelve a revisar otro tema a tu ritmo.", [f"Repasar: {topic['label']}", '🎯 Hacer una simulación', '📚 Elegir otro tema', '🏠 Volver al inicio'], sources=topic.get('sources', []), feedback={'correct': correct, 'selected': quiz['options'][index], 'answer': correct_option, 'support': support})
 
     # --------------------------------------------------------
     # MENÚ DE ORIENTACIÓN
@@ -1658,6 +1676,7 @@ def answer_message(message: str, session_id: str) -> ChatReply:
                 return ChatReply(
                     f"{item['question']}\n\nSelecciona una opción:",
                     item["options"],
+                    progress={"current": 1, "total": 2},
                 )
 
         if text in {
@@ -1691,17 +1710,22 @@ def answer_message(message: str, session_id: str) -> ChatReply:
                 state["options"],
             )
 
-        SESSIONS.pop(session_id, None)
+        selected = find_option_index(message, item["options"])
+        if selected is None:
+            return ChatReply("Elige una opción de esta pregunta para continuar.", item["options"])
+        state.update({"mode": "guidance-context", "choice": item["options"][selected][3:]})
+        question, options, _ = FOLLOW_UPS[state["topic"]]
+        return ChatReply(f"VAMOS PASO A PASO\n\nHas elegido: {state['choice']}\n\n{question}\n\nEsta pregunta permite priorizar las acciones según lo que ocurrió. No necesitas compartir datos personales.", options + ["Orientación ante una situación", "🏠 Volver al inicio"], progress={"current": 2, "total": 2})
 
-        return ChatReply(
-            response,
-            [
-                "🎯 Simulación educativa",
-                "🎓 Quiero aprender",
-                "🛡️ Evaluar mis prácticas digitales",
-                "🏠 Volver al inicio",
-            ],
-        )
+    if state and state["mode"] == "guidance-context":
+        _, options, _ = FOLLOW_UPS[state["topic"]]
+        selected = find_option_index(message, options)
+        if selected is None:
+            return ChatReply("Selecciona una opción de esta pregunta; tu recorrido se conserva.", options + ["🏠 Volver al inicio"])
+        result = action_plan(state["topic"], state["choice"], selected)
+        sources = guidance_sources(state["topic"])
+        SESSIONS.pop(session_id, None)
+        return ChatReply(result, ["Orientación ante una situación", "🎯 Simulación educativa", "🎓 Quiero aprender", "Mis derechos y denuncias", "🏠 Volver al inicio"], sources=sources)
 
     # --------------------------------------------------------
     # MENÚ DE EDUCACIÓN
@@ -1780,7 +1804,7 @@ def answer_message(message: str, session_id: str) -> ChatReply:
             if not final:
                 state.update(mode='simulation-answer', step=index + 1)
                 chosen = 'ABC'.index(state['decisions'][-1]['label'][0])
-                recap = 'Sobre tu decisión anterior: ' + item['explanations'][chosen]
+                recap = ('Tu elección protegió los datos. ' if state['decisions'][-1]['correct'] else 'Antes de avanzar, corrige este criterio: ') + item['explanations'][chosen] + '\n' + item['consequence']
                 return ChatReply(stage_reply(simulation, index + 1, recap), simulation['steps'][index + 1]['options'] + ['Necesito una pista'], sources=simulation['sources'], simulation={**meta, 'current': index + 2})
             decisions = state['decisions']
             secure = sum(d['correct'] for d in decisions)
@@ -1791,9 +1815,12 @@ def answer_message(message: str, session_id: str) -> ChatReply:
                 outcome = 'Correcta' if decision['correct'] else 'Incorrecta en este ejercicio; puedes mejorar este criterio'
                 review.append(f"PASO {number} · {original['title'].upper()}\nResultado: {outcome}\nTu elección: {decision['label']}\nRespuesta correcta: {original['options'][correct_index]}\nPor qué: {original['explanations'][correct_index]}")
             reinforce = [simulation['steps'][i]['title'].lower() for i, d in enumerate(decisions) if not d['correct']]
-            focus = 'Refuerza: ' + ', '.join(reinforce) + '.' if reinforce else 'Reconociste los criterios preventivos de las cuatro etapas. Sigue aplicándolos en situaciones nuevas.'
+            focus = 'Reconociste los criterios preventivos de las cuatro etapas. Sigue aplicándolos en situaciones nuevas.'
+            if reinforce:
+                priorities = [f"• {simulation['steps'][i]['title']}: {simulation['steps'][i]['explanations']['ABC'.index(simulation['steps'][i]['correct'])]}" for i, decision in enumerate(decisions) if not decision['correct']]
+                focus = 'Puedes mejorar estos criterios. Empieza por el primero y repite el ejercicio a tu ritmo:\n' + '\n'.join(priorities)
             SESSIONS.pop(session_id, None)
-            return ChatReply(f"RECORRIDO COMPLETADO\n{simulation['label']} · {secure} de 4 decisiones alineadas con el criterio preventivo. Este ejercicio no mide tu riesgo real.\n\n" + '\n\n'.join(review) + f"\n\nTU SIGUIENTE ACCIÓN\n{focus}", ['🎯 Hacer una simulación', '🎓 Quiero aprender', '🆘 Orientación ante una situación', '🏠 Volver al inicio'], sources=simulation['sources'], simulation={**meta, 'phase': 'complete'})
+            return ChatReply(f"RECORRIDO COMPLETADO\n{simulation['label']} · {secure} de 4 decisiones alineadas con el criterio preventivo. Este ejercicio no mide tu riesgo real.\n\n" + '\n\n'.join(review) + f"\n\nTU SIGUIENTE ACCIÓN\n{focus}", [f"Repetir: {simulation['label']}", '🎯 Hacer una simulación', '🎓 Quiero aprender', '🆘 Orientación ante una situación', '🏠 Volver al inicio'], sources=simulation['sources'], simulation={**meta, 'phase': 'complete'})
         if text == normalize('Necesito una pista'):
             clue = item['explanations']['ABC'.index(item['correct'])]
             return ChatReply(f"PISTA PARA DECIDIR\n{clue}\n\nVUELVE A LA SITUACIÓN\n{item['scene']}\n\nTU DECISIÓN\n{item['question']}", item['options'] + ['Necesito una pista'], sources=simulation['sources'], simulation=meta)
@@ -1936,6 +1963,7 @@ def answer_message(message: str, session_id: str) -> ChatReply:
                 f"Nivel de riesgo preventivo: {level}\n"
                 f"Puntuación: {score}/{max_score} ({percentage}%)\n\n"
 
+                "CÓMO SE CALCULA\nCada respuesta suma 0, 1 o 2 puntos según el criterio preventivo definido. El porcentaje expresa puntos sobre el máximo, no probabilidad de sufrir un incidente. Bajo: hasta 33 %; moderado: hasta 66 %; alto: por encima de 66 %. Son umbrales educativos del prototipo, pendientes de validación.\n\n"
                 "📊 INTERPRETACIÓN DE TUS RESPUESTAS\n"
                 f"{interpretation}\n\n"
 

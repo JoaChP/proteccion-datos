@@ -138,7 +138,7 @@ function ObjectiveCard({ number, title, children }) {
 
       <div className="about-objective-body">
         <h3>{title}</h3>
-        <ReadMore label={title} limit={150}><p>{children}</p></ReadMore>
+        <p>{children}</p>
       </div>
     </article>
   );
@@ -512,7 +512,7 @@ export default function AcercaProyecto() {
           <div className="about-objective-main">
 
             <div className="about-objective-main-number">
-              01
+              4.1
             </div>
 
             <div>
@@ -553,7 +553,7 @@ export default function AcercaProyecto() {
           <div className="about-objectives-list">
 
             <ObjectiveCard
-              number="01"
+              number="5.1"
               title="Investigación"
             >
               Investigar la ciberseguridad de protección de datos
@@ -563,28 +563,28 @@ export default function AcercaProyecto() {
             </ObjectiveCard>
 
             <ObjectiveCard
-              number="02"
+              number="5.2"
               title="Diseño tecnológico"
             >
               Diseñar la arquitectura tecnológica de la página web, la base de datos y la integración del chatbot interactivo, definiendo la estructura funcional y los flujos conversacionales necesarios para la orientación, evaluación y prevención en protección de datos personales y seguridad digital.
             </ObjectiveCard>
 
             <ObjectiveCard
-              number="03"
+              number="5.3"
               title="Desarrollo de la plataforma"
             >
               Desarrollar la página web con secciones sobre protección de datos personales, buenas prácticas de privacidad, recursos educativos y contenidos de prevención y seguridad digital, para la facilitación del acceso de la ciudadanía a información clara y accesible sobre protección de datos personales.
             </ObjectiveCard>
 
             <ObjectiveCard
-              number="04"
+              number="5.4"
               title="Implementación del chatbot"
             >
               Implementar un chatbot interactivo dentro de la página web para la orientación y evaluación al usuario mediante flujos conversacionales, brindando recomendaciones preventivas relacionadas con la protección de datos personales y la seguridad digital.
             </ObjectiveCard>
 
             <ObjectiveCard
-              number="05"
+              number="5.5"
               title="Evaluación"
             >
               Probar el uso y la aceptación de la página web informativa y del chatbot interactivo con distintos grupos de usuarios, para la evaluación de su usabilidad y utilidad como herramienta.
