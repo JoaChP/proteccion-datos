@@ -1,6 +1,7 @@
 """FastAPI application and guided knowledge base for Protección de Datos CR."""
 
 from datetime import datetime, timezone
+import logging
 import os
 from typing import Any, Annotated
 from uuid import uuid4
@@ -13,8 +14,9 @@ from fastapi import FastAPI, Query, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from .guidance_content import FOLLOW_UPS, action_plan, guidance_sources
-from .chat_sources import supporting_sources
+from .chat_sources import CSIRT, LAW, OIJ, PRIVACY, PRODHAB, supporting_sources
 from .learning_content import EXTENDED_TOPICS, PLAIN_TOPICS, LEARNING_CHECKS, assessment_report
+from .database import bootstrap_chatbot_content, database_available
 
 API_PREFIX = "/api/v1"
 DEFAULT_ORIGINS = (
@@ -1297,6 +1299,28 @@ ASSESSMENT = [
 # Five assessment areas defined in the initial knowledge base.
 ASSESSMENT = [question for question in ASSESSMENT if question[0] != "Incidentes digitales"]
 SESSIONS: dict[str, dict[str, Any]] = {}
+DATABASE_SYNC_ERROR: str | None = None
+
+
+def ensure_database_content() -> bool:
+    """Initialize Neon and copy the curated knowledge base once per instance."""
+    global DATABASE_SYNC_ERROR
+    if not database_available():
+        return False
+    try:
+        bootstrap_chatbot_content(
+            GUIDANCE,
+            EDUCATION_TOPICS,
+            SIMULATIONS,
+            ASSESSMENT,
+            [LAW, PRODHAB, OIJ, CSIRT, PRIVACY],
+        )
+        DATABASE_SYNC_ERROR = None
+        return True
+    except Exception as error:  # Keep the public educational flow available.
+        DATABASE_SYNC_ERROR = str(error)
+        logging.exception("Unable to synchronize chatbot content with PostgreSQL")
+        return False
 
 
 # ============================================================
@@ -2220,12 +2244,18 @@ def translate_chat_text(text: str, target_language: str) -> str:
 
 
 @app.get("/health")
-def health_check() -> dict[str, str]:
-    return {"status": "ok"}
+def health_check() -> dict[str, str | bool]:
+    database_ready = ensure_database_content()
+    return {
+        "status": "ok",
+        "database_configured": database_available(),
+        "database_synchronized": database_ready,
+    }
 
 
 @app.post(f"{API_PREFIX}/chatbot/message", response_model=ChatReply)
 def send_chatbot_message(payload: ChatMessage) -> ChatReply:
+    ensure_database_content()
     if payload.history is None:
         result = answer_message(payload.message, payload.session_id)
     else:
