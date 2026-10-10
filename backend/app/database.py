@@ -6,15 +6,19 @@ import os
 from pathlib import Path
 from typing import Any
 
-from psycopg import connect
-from psycopg.types.json import Jsonb
+try:
+    from psycopg import connect
+    from psycopg.types.json import Jsonb
+except ModuleNotFoundError:  # Allows the educational API to run before dependencies install.
+    connect = None
+    Jsonb = None
 
 SCHEMA_PATH = Path(__file__).resolve().parents[1] / "database" / "schema.sql"
 _bootstrapped = False
 
 
 def database_available() -> bool:
-    return bool(os.getenv("DATABASE_URL"))
+    return bool(os.getenv("DATABASE_URL")) and connect is not None
 
 
 def _route(conn: Any, slug: str, title: str, description: str, position: int) -> int:
