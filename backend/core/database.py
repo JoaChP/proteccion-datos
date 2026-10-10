@@ -104,7 +104,7 @@ def bootstrap_chatbot_content(
             for step_position, step in enumerate(item["steps"], start=1):
                 step_id = _content(
                     conn, routes["education"], f"simulation:{key}:step:{step_position}", "simulation_step", step["title"],
-                    {"scenario_key": key, "scene": step["scene"], "question": step["question"], "correct": step["correct"], "support": step["support"]}, step_position,
+                    {"scenario_key": key, "scene": step["scene"], "question": step["question"], "correct": step["correct"], "support": step["consequence"]}, step_position,
                 )
                 _options(conn, step_id, [
                     {"key": letter, "label": label, "outcome": {"explanation": step["explanations"][index]}, "score": 0 if letter == step["correct"] else 1}
