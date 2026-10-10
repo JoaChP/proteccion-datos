@@ -1318,7 +1318,7 @@ def ensure_database_content() -> bool:
         DATABASE_SYNC_ERROR = None
         return True
     except Exception as error:  # Keep the public educational flow available.
-        DATABASE_SYNC_ERROR = str(error)
+        DATABASE_SYNC_ERROR = type(error).__name__
         logging.exception("Unable to synchronize chatbot content with PostgreSQL")
         return False
 
@@ -2244,12 +2244,13 @@ def translate_chat_text(text: str, target_language: str) -> str:
 
 
 @app.get("/health")
-def health_check() -> dict[str, str | bool]:
+def health_check() -> dict[str, str | bool | None]:
     database_ready = ensure_database_content()
     return {
         "status": "ok",
         "database_configured": database_available(),
         "database_synchronized": database_ready,
+        "database_error_type": DATABASE_SYNC_ERROR,
     }
 
 
