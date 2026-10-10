@@ -10,7 +10,7 @@ Desde la raíz del proyecto:
 python -m venv backend\.venv
 backend\.venv\Scripts\Activate.ps1
 pip install -r backend\requirements.txt
-uvicorn app.main:app --app-dir backend --reload
+uvicorn core.main:app --app-dir backend --reload
 ```
 
 La API se inicia en `http://localhost:8000`; la documentación interactiva está en `http://localhost:8000/docs`.

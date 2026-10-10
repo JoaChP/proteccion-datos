@@ -1,7 +1,7 @@
 import unittest
 from itertools import product
 from unittest.mock import patch
-from app.main import (answer_message, send_chatbot_message, ChatMessage, GUIDANCE,
+from core.main import (answer_message, send_chatbot_message, ChatMessage, GUIDANCE,
                       SIMULATIONS, EDUCATION_OPTIONS, EDUCATION_TOPICS, ASSESSMENT, SESSIONS, LEARNING_GROUPS)
 from app.learning_content import LEARNING_CHECKS, assessment_report
 
@@ -192,7 +192,7 @@ class GuidedChatTests(unittest.TestCase):
             self.assertEqual(len(result.suggestions), 3)
 
     def test_sources_survive_translation(self):
-        with patch('app.main.translate_chat_text', side_effect=lambda text, lang: text):
+        with patch('core.main.translate_chat_text', side_effect=lambda text, lang: text):
             result = send_chatbot_message(ChatMessage(message='📖 ¿Qué es la Ley N.º 8968?', session_id='test', language='en'))
         self.assertTrue(any('8968' in source['title'] for source in result.sources))
 
