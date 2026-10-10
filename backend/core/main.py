@@ -1352,10 +1352,11 @@ def root_reply() -> ChatReply:
     return ChatReply(
         (
             "¡Hola! Soy el asistente de Protección de Datos CR. 👋\n\n"
-            "Este chatbot está diseñado para orientarte y ayudarte a aprender "
-            "sobre protección de datos personales y seguridad digital.\n\n"
-            "Selecciona una opción para comenzar. No necesitas escribir "
-            "información personal."
+            "Puedo ayudarte con tres cosas:\n"
+            "• Orientarte ante fraude, phishing, cuentas comprometidas o solicitudes de datos.\n"
+            "• Enseñarte a proteger tus datos mediante ejemplos y simulaciones.\n"
+            "• Revisar tus hábitos digitales y darte recomendaciones preventivas.\n\n"
+            "Elige una opción para empezar. No escribas contraseñas, códigos ni datos personales."
         ),
         ROOT_OPTIONS,
     )
@@ -2113,8 +2114,8 @@ def answer_message(message: str, session_id: str) -> ChatReply:
     # --------------------------------------------------------
     return ChatReply(
         (
-            "Para mantener la orientación estructurada, selecciona "
-            "una de las opciones disponibles."
+            "Para darte una orientación útil, elige una de las opciones disponibles. "
+            "Así sabré si necesitas ayuda ante una situación, aprender o revisar tus hábitos."
         ),
         ROOT_OPTIONS,
     )
