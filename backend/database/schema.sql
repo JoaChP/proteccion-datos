@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS chatbot_content (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     route_id BIGINT NOT NULL REFERENCES chatbot_routes(id) ON DELETE CASCADE,
     content_key TEXT NOT NULL UNIQUE,
-    content_type TEXT NOT NULL CHECK (content_type IN ('guidance', 'learning', 'simulation', 'simulation_step', 'assessment_question')),
+    content_type TEXT NOT NULL CHECK (content_type IN ('guidance', 'learning', 'learning_check', 'simulation', 'simulation_step', 'assessment_question')),
     title TEXT NOT NULL,
     body JSONB NOT NULL DEFAULT '{}'::jsonb,
     position SMALLINT NOT NULL DEFAULT 0,
@@ -26,6 +26,12 @@ CREATE TABLE IF NOT EXISTS chatbot_content (
 );
 
 CREATE INDEX IF NOT EXISTS chatbot_content_route_position_idx ON chatbot_content(route_id, position);
+
+-- The first deployment created the table before learning checks were stored.
+-- Recreate this constraint safely so existing Neon databases receive the new type.
+ALTER TABLE chatbot_content DROP CONSTRAINT IF EXISTS chatbot_content_content_type_check;
+ALTER TABLE chatbot_content ADD CONSTRAINT chatbot_content_content_type_check
+    CHECK (content_type IN ('guidance', 'learning', 'learning_check', 'simulation', 'simulation_step', 'assessment_question'));
 
 CREATE TABLE IF NOT EXISTS chatbot_options (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,

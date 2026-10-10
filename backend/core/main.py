@@ -16,7 +16,7 @@ from pydantic import BaseModel, Field
 from .guidance_content import FOLLOW_UPS, action_plan, guidance_sources
 from .chat_sources import CSIRT, LAW, OIJ, PRIVACY, PRODHAB, supporting_sources
 from .learning_content import EXTENDED_TOPICS, PLAIN_TOPICS, LEARNING_CHECKS, assessment_report
-from .database import bootstrap_chatbot_content, database_available
+from .database import bootstrap_chatbot_content, database_available, load_chatbot_content
 
 API_PREFIX = "/api/v1"
 DEFAULT_ORIGINS = (
@@ -1304,17 +1304,29 @@ DATABASE_SYNC_ERROR: str | None = None
 
 def ensure_database_content() -> bool:
     """Initialize Neon and copy the curated knowledge base once per instance."""
-    global DATABASE_SYNC_ERROR
+    global DATABASE_SYNC_ERROR, GUIDANCE, EDUCATION_TOPICS, SIMULATIONS, ASSESSMENT
+    global LEARNING_CHECKS, EDUCATION_OPTIONS, SIMULATION_OPTIONS
     if not database_available():
         return False
     try:
         bootstrap_chatbot_content(
             GUIDANCE,
             EDUCATION_TOPICS,
+            LEARNING_CHECKS,
             SIMULATIONS,
             ASSESSMENT,
             [LAW, PRODHAB, OIJ, CSIRT, PRIVACY],
         )
+        stored = load_chatbot_content()
+        if stored is None:
+            raise RuntimeError("The chatbot knowledge base is incomplete.")
+        GUIDANCE = stored["guidance"]
+        EDUCATION_TOPICS = stored["education"]
+        LEARNING_CHECKS = stored["learning_checks"]
+        SIMULATIONS = stored["simulations"]
+        ASSESSMENT = stored["assessment"]
+        EDUCATION_OPTIONS = [item["label"] for item in EDUCATION_TOPICS.values()]
+        SIMULATION_OPTIONS = [item["label"] for item in SIMULATIONS.values()]
         DATABASE_SYNC_ERROR = None
         return True
     except Exception as error:  # Keep the public educational flow available.
