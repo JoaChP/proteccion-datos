@@ -15,6 +15,7 @@ except ModuleNotFoundError:  # Allows the educational API to run before dependen
 
 SCHEMA_PATH = Path(__file__).resolve().parents[1] / "database" / "schema.sql"
 _bootstrapped = False
+SEED_VERSION = "clarity-2026-10-10"
 
 
 def database_available() -> bool:
@@ -106,11 +107,16 @@ def bootstrap_chatbot_content(
             "assessment": _route(conn, "assessment", "Evaluación de riesgo digital", "Cuestionario educativo de prácticas digitales.", 3),
         }
 
-        has_initial_content = conn.execute(
-            "SELECT EXISTS (SELECT 1 FROM chatbot_content)"
-        ).fetchone()[0]
+        stored_version = conn.execute(
+            "SELECT value FROM chatbot_metadata WHERE key = 'chatbot_seed_version'"
+        ).fetchone()
+        should_refresh_seed = (
+            not conn.execute("SELECT EXISTS (SELECT 1 FROM chatbot_content)").fetchone()[0]
+            or stored_version is None
+            or stored_version[0] != SEED_VERSION
+        )
 
-        if not has_initial_content:
+        if should_refresh_seed:
             for position, (key, item) in enumerate(guidance.items(), start=1):
                 content_id = _content(conn, routes["guidance"], f"guidance:{key}", "guidance", item["label"], {"question": item["question"]}, position)
                 _options(conn, content_id, [
@@ -144,6 +150,15 @@ def bootstrap_chatbot_content(
                 ])
 
         _learning_checks(conn, routes["education"], learning_checks)
+
+        if should_refresh_seed:
+            conn.execute(
+                """INSERT INTO chatbot_metadata (key, value, updated_at)
+                VALUES ('chatbot_seed_version', %s, NOW())
+                ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value,
+                    updated_at = NOW()""",
+                (SEED_VERSION,),
+            )
 
         for index, source in enumerate(sources, start=1):
             conn.execute(

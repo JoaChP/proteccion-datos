@@ -1406,7 +1406,7 @@ def guidance_menu_reply() -> ChatReply:
     return ChatReply(
         (
             "🆘 ORIENTACIÓN Y ASISTENCIA\n\n"
-            "Selecciona la situación que más se parece a tu caso.\n\n"
+            "Elige la situación más parecida a la tuya. Te indicaré qué hacer primero.\n\n"
             "No compartas contraseñas, PIN, códigos de autenticación, "
             "números completos de tarjeta ni otra información confidencial."
         ),
@@ -1418,10 +1418,9 @@ def education_menu_reply() -> ChatReply:
     return ChatReply(
         (
             "🎓 EDUCACIÓN Y APRENDIZAJE\n\n"
-            "¿Qué quieres aprender hoy? Elige un grupo y después un tema.\n\n"
-            "Cada tema sigue tres pasos: una explicación breve, un ejemplo "
-            "y una pregunta con respuesta explicada. Si no sabes por dónde "
-            "empezar, elige proteger tus cuentas."
+            "Elige un grupo y luego un tema. Recibirás una explicación corta, "
+            "un ejemplo y una pregunta para practicar.\n\n"
+            "Si no sabes por dónde empezar, elige «Proteger mis cuentas y dispositivos»."
         ),
         list(LEARNING_GROUPS) + ["🎯 Hacer una simulación", "🏠 Volver al inicio"],
     )
@@ -1431,10 +1430,10 @@ def simulation_menu_reply() -> ChatReply:
     return ChatReply(
         (
             "🎯 SIMULACIONES EDUCATIVAS\n\n"
-            "Practica sin usar datos reales. Cada recorrido tiene cuatro pasos: "
-            "reconocer, verificar, actuar y dar seguimiento.\n\n"
-            "Elige una opción en cada paso. Después verás qué puede ocurrir "
-            "y por qué conviene esa decisión. Puedes salir desde el menú lateral."
+            "Practica decisiones sin usar datos reales. Cada recorrido tiene cuatro "
+            "pasos: reconocer, verificar, actuar y dar seguimiento.\n\n"
+            "Elige una opción en cada paso. Te explicaré de inmediato por qué es "
+            "segura o riesgosa."
         ),
         SIMULATION_OPTIONS + ["🎓 Quiero aprender", "🏠 Volver al inicio"],
     )
@@ -1444,9 +1443,9 @@ def rights_menu_reply() -> ChatReply:
     return ChatReply(
         (
             "⚖️ DERECHOS Y ORIENTACIÓN EN COSTA RICA\n\n"
-            "La Ley N.º 8968 establece un marco para la protección de las "
-            "personas frente al tratamiento de sus datos personales.\n\n"
-            "Selecciona qué deseas conocer:"
+            "Aquí puedes conocer, en lenguaje sencillo, los derechos sobre tus "
+            "datos personales reconocidos por la Ley N.º 8968.\n\n"
+            "Elige el tema que necesitas:"
         ),
         [
             "📖 ¿Qué es la Ley N.º 8968?",
@@ -1467,15 +1466,12 @@ def rights_reply(message: str) -> ChatReply | None:
         return ChatReply(
             (
                 "📖 LEY N.º 8968\n\n"
-                "La Ley N.º 8968, Ley de Protección de la Persona frente al "
-                "tratamiento de sus datos personales, constituye el marco "
-                "costarricense de referencia para proteger a las personas "
-                "frente al tratamiento de sus datos personales.\n\n"
-                "Su finalidad se relaciona con la protección de la persona "
-                "y el control sobre el uso de su información personal.\n\n"
-                "El chatbot presenta información educativa y general. La "
-                "aplicación de la normativa a un caso concreto puede depender "
-                "de sus circunstancias."
+                "Es la ley de Costa Rica que protege a las personas cuando una "
+                "entidad recopila, usa, guarda o comparte sus datos personales.\n\n"
+                "En pocas palabras: puedes pedir información sobre el uso de tus "
+                "datos y solicitar corrección, supresión u oposición cuando corresponda.\n\n"
+                "Esta explicación es educativa. Para un caso concreto, usa el "
+                "procedimiento de la entidad o consulta a PRODHAB."
             ),
             [
                 "👁️ Derecho de acceso",
@@ -1491,14 +1487,12 @@ def rights_reply(message: str) -> ChatReply | None:
         return ChatReply(
             (
                 "👁️ DERECHO DE ACCESO\n\n"
-                "Permite solicitar información relacionada con los datos "
-                "personales que una entidad trata sobre la persona, en los "
-                "términos que correspondan.\n\n"
-                "¿Por qué es importante?\n"
-                "Ayuda a conocer qué información se mantiene y cómo se "
-                "relaciona con el tratamiento realizado.\n\n"
-                "Buena práctica: realiza las solicitudes por un medio que "
-                "deje constancia y conserva la respuesta."
+                "Te permite pedir a una entidad información sobre los datos "
+                "personales que tiene sobre ti y cómo los usa.\n\n"
+                "QUÉ HACER\n"
+                "1. Identifica a la entidad responsable.\n"
+                "2. Usa su canal oficial para hacer la solicitud.\n"
+                "3. Guarda la solicitud y la respuesta."
             ),
             [
                 "✏️ Derecho de rectificación",
@@ -1512,12 +1506,11 @@ def rights_reply(message: str) -> ChatReply | None:
         return ChatReply(
             (
                 "✏️ DERECHO DE RECTIFICACIÓN\n\n"
-                "Permite solicitar la corrección de datos personales "
-                "inexactos o incompletos cuando corresponda.\n\n"
-                "Ejemplo: una organización mantiene un dato personal "
-                "incorrecto y necesitas que sea actualizado.\n\n"
-                "Buena práctica: identifica claramente el dato que debe "
-                "corregirse y conserva evidencia de la solicitud."
+                "Te permite pedir que corrijan un dato tuyo que sea incorrecto "
+                "o esté incompleto.\n\n"
+                "EJEMPLO\nUna organización tiene un teléfono o dirección incorrectos.\n\n"
+                "QUÉ HACER\nIndica cuál dato debe corregirse, presenta la información "
+                "necesaria por el canal oficial y guarda constancia."
             ),
             [
                 "👁️ Derecho de acceso",
@@ -1531,12 +1524,11 @@ def rights_reply(message: str) -> ChatReply | None:
         return ChatReply(
             (
                 "🗑️ DERECHO DE SUPRESIÓN\n\n"
-                "Se relaciona con la posibilidad de solicitar la eliminación "
-                "de datos personales cuando corresponda.\n\n"
-                "La procedencia de una solicitud puede depender del caso y "
-                "de las condiciones aplicables al tratamiento.\n\n"
-                "Por eso el chatbot ofrece orientación general y no determina "
-                "jurídicamente si una solicitud concreta debe ser aceptada."
+                "Te permite pedir que eliminen tus datos personales cuando la "
+                "situación lo permita.\n\n"
+                "QUÉ HACER\nSolicita la eliminación a la entidad responsable y "
+                "guarda la respuesta. La entidad debe revisar tu caso según la ley; "
+                "este asistente no puede decidir si la solicitud será aceptada."
             ),
             [
                 "👁️ Derecho de acceso",
@@ -1550,12 +1542,10 @@ def rights_reply(message: str) -> ChatReply | None:
         return ChatReply(
             (
                 "🚫 DERECHO DE OPOSICIÓN\n\n"
-                "Se relaciona con la posibilidad de oponerse a determinados "
-                "tratamientos de datos personales cuando corresponda.\n\n"
-                "La aplicación concreta depende de las circunstancias y de "
-                "las condiciones establecidas por el marco jurídico aplicable.\n\n"
-                "Si tienes un caso específico, conserva la evidencia y busca "
-                "orientación institucional."
+                "Te permite manifestar que no estás de acuerdo con un uso de tus "
+                "datos personales, cuando corresponda.\n\n"
+                "QUÉ HACER\nExplica a la entidad qué uso de tus datos quieres "
+                "cuestionar, utiliza su canal oficial y conserva la evidencia."
             ),
             [
                 "👁️ Derecho de acceso",
@@ -1570,13 +1560,12 @@ def rights_reply(message: str) -> ChatReply | None:
         return ChatReply(
             (
                 "🏛️ PRODHAB\n\n"
-                "La Agencia de Protección de Datos de los Habitantes "
-                "(PRODHAB) es la autoridad costarricense relacionada con "
-                "la protección de los datos personales y la supervisión "
-                "del cumplimiento de la normativa correspondiente.\n\n"
-                "Para conocer procedimientos y requisitos actualizados, "
-                "consulta directamente los canales oficiales de PRODHAB.\n\n"
-                "El chatbot no sustituye el procedimiento oficial."
+                "PRODHAB es la autoridad costarricense de protección de datos "
+                "personales. Puede orientarte sobre los procedimientos relacionados "
+                "con el tratamiento de tus datos.\n\n"
+                "Antes de contactarla, guarda tu solicitud a la entidad, su respuesta "
+                "y la evidencia relevante. Consulta siempre sus canales oficiales "
+                "para conocer requisitos actualizados."
             ),
             [
                 "📍 ¿Dónde puedo denunciar?",
@@ -1589,19 +1578,15 @@ def rights_reply(message: str) -> ChatReply | None:
         return ChatReply(
             (
                 "📍 ¿DÓNDE PUEDO BUSCAR ORIENTACIÓN?\n\n"
-                "La institución depende de la naturaleza de la situación.\n\n"
+                "El canal depende de lo que ocurrió.\n\n"
                 "🏛️ PRODHAB\n"
-                "Para asuntos relacionados con protección y tratamiento de "
-                "datos personales.\n\n"
+                "Si el problema es el uso o tratamiento de datos personales.\n\n"
                 "👮 OIJ\n"
-                "Para posibles delitos, como fraude, suplantación o acceso "
-                "indebido, según corresponda.\n\n"
+                "Si hay un posible delito: fraude, suplantación o acceso no autorizado.\n\n"
                 "🛡️ CSIRT-CR\n"
-                "Para determinados incidentes de ciberseguridad dentro de "
-                "su ámbito de atención.\n\n"
-                "Antes de reportar, conserva capturas, correos, enlaces, "
-                "comprobantes y otros elementos relevantes.\n\n"
-                "Utiliza siempre los canales oficiales de cada institución."
+                "Para incidentes de ciberseguridad dentro de su ámbito de atención.\n\n"
+                "Antes de reportar, guarda capturas, correos, enlaces y comprobantes. "
+                "No publiques datos personales ni códigos. Usa solo los canales oficiales."
             ),
             [
                 "🏛️ PRODHAB",
@@ -1652,7 +1637,7 @@ def answer_message(message: str, session_id: str) -> ChatReply:
         return rights_menu_reply()
     if text == normalize("Evaluar mis prácticas digitales"):
         SESSIONS[session_id] = {"mode": "assessment", "index": 0, "score": 0, "answers": []}
-        return ChatReply("Revisa tus hábitos en cinco áreas: contraseñas, navegación, privacidad, compras y derechos. Selecciona una respuesta por pregunta. El resultado es orientativo y se basa únicamente en tus elecciones.", ["▶️ Iniciar evaluación", "🏠 Volver al inicio"])
+        return ChatReply("Responderás preguntas sobre contraseñas, navegación, privacidad, compras y derechos. Al final recibirás recomendaciones según tus elecciones. Es una guía preventiva, no un diagnóstico.", ["▶️ Iniciar evaluación", "🏠 Volver al inicio"])
     if text == normalize("Iniciar evaluación"):
         SESSIONS[session_id] = {"mode": "assessment", "index": 0, "score": 0, "answers": []}
         return assessment_question(session_id)
@@ -1679,7 +1664,7 @@ def answer_message(message: str, session_id: str) -> ChatReply:
     if state and state['mode'] == 'learning-content' and text == normalize('Comprobar lo aprendido'):
         quiz = LEARNING_CHECKS[state['topic']]
         state['mode'] = 'learning-check'
-        return ChatReply(f"COMPRUEBA LO APRENDIDO\n\n{quiz['question']}", quiz['options'])
+        return ChatReply(f"PREGUNTA DE PRÁCTICA\n\n{quiz['question']}", quiz['options'])
     if state and state['mode'] == 'learning-check':
         quiz = LEARNING_CHECKS[state['topic']]
         index = find_option_index(message, quiz['options'])
@@ -1692,7 +1677,8 @@ def answer_message(message: str, session_id: str) -> ChatReply:
         support = '¡Bien! Identificaste el criterio que ayuda a proteger tus datos. Ahora puedes practicar cómo aplicarlo.' if correct else 'Gracias por intentarlo. Esta situación puede generar dudas. Puedes aprender de esta elección sin exponerte a un riesgo real.'
         topic = EDUCATION_TOPICS[state['topic']]
         SESSIONS.pop(session_id, None)
-        return ChatReply(f"{title}\n{support}\n\nTU RESPUESTA\n{quiz['options'][index]}\n\nRESPUESTA CORRECTA Y POR QUÉ\n{correct_option}\n{quiz['explanation']}\n\nPARA PROTEGER TUS DATOS\n{topic['content'].split('APLICA LO APRENDIDO')[-1].strip()}\n\nSIGUIENTE PASO\nPractica este criterio en una simulación o vuelve a revisar otro tema a tu ritmo.", [f"Repasar: {topic['label']}", '🎯 Hacer una simulación', '📚 Elegir otro tema', '🏠 Volver al inicio'], sources=topic.get('sources', []), feedback={'correct': correct, 'selected': quiz['options'][index], 'answer': correct_option, 'support': support})
+        practice = topic['content'].split('QUÉ HACER')[-1].strip()
+        return ChatReply(f"{title}\n{support}\n\nELEGISTE\n{quiz['options'][index]}\n\nRESPUESTA RECOMENDADA\n{correct_option}\n{quiz['explanation']}\n\nQUÉ HACER\n{practice}\n\nSIGUIENTE PASO\nPuedes practicar este tema en una simulación o elegir otro.", [f"Repasar: {topic['label']}", '🎯 Hacer una simulación', '📚 Elegir otro tema', '🏠 Volver al inicio'], sources=topic.get('sources', []), feedback={'correct': correct, 'selected': quiz['options'][index], 'answer': correct_option, 'support': support})
 
     # --------------------------------------------------------
     # MENÚ DE ORIENTACIÓN
@@ -1751,7 +1737,7 @@ def answer_message(message: str, session_id: str) -> ChatReply:
             return ChatReply("Elige una opción de esta pregunta para continuar.", item["options"])
         state.update({"mode": "guidance-context", "choice": item["options"][selected][3:]})
         question, options, _ = FOLLOW_UPS[state["topic"]]
-        return ChatReply(f"VAMOS PASO A PASO\n\nHas elegido: {state['choice']}\n\n{question}\n\nEsta pregunta permite priorizar las acciones según lo que ocurrió. No necesitas compartir datos personales.", options + ["Orientación ante una situación", "🏠 Volver al inicio"], progress={"current": 2, "total": 2})
+        return ChatReply(f"PARA ORIENTARTE MEJOR\n\nSituación elegida: {state['choice']}\n\n{question}\n\nNo escribas contraseñas, códigos, números de tarjeta ni otros datos personales.", options + ["Orientación ante una situación", "🏠 Volver al inicio"], progress={"current": 2, "total": 2})
 
     if state and state["mode"] == "guidance-context":
         _, options, _ = FOLLOW_UPS[state["topic"]]
@@ -1770,7 +1756,7 @@ def answer_message(message: str, session_id: str) -> ChatReply:
         group = next((label for label in LEARNING_GROUPS if normalize(label) == text), None)
         if group:
             state['group'] = group
-            return ChatReply(f"{group}\n\nElige un tema. Puedes leer a tu ritmo y luego comprobar lo aprendido.", [EDUCATION_TOPICS[key]['label'] for key in LEARNING_GROUPS[group]] + ['📚 Elegir otro tema', '🏠 Volver al inicio'])
+            return ChatReply(f"{group}\n\nElige un tema. Recibirás una explicación breve y luego podrás practicar con una pregunta.", [EDUCATION_TOPICS[key]['label'] for key in LEARNING_GROUPS[group]] + ['📚 Elegir otro tema', '🏠 Volver al inicio'])
         selected = find_option_index(
             message,
             EDUCATION_OPTIONS,
@@ -1872,7 +1858,7 @@ def answer_message(message: str, session_id: str) -> ChatReply:
         support = '¡Bien hecho! Elegiste la alternativa que mejor protege tus datos en esta situación.' if correct else 'Es comprensible que esta situación genere dudas. Este es un espacio para practicar: revisemos juntos cómo protegerte mejor.'
         correct_option = item['options'][correct_index]
         rationale = item['explanations'][correct_index]
-        return ChatReply(f"{heading}\n{support}\n\nTU RESPUESTA\n{item['options'][selected]}\n{explanation}\n\nRESPUESTA CORRECTA Y POR QUÉ\n{correct_option}\n{rationale}\n\nCÓMO APLICARLO\n{item['consequence']}\n\nUN PASO PARA PROTEGERTE\n{correct_option[3:]}\nAntes de actuar en una situación real, verifica el canal y evita entregar información que no sea necesaria.", ['Ver mi resumen' if index == 3 else 'Continuar al siguiente paso', '🎯 Hacer una simulación'], sources=simulation['sources'], simulation={**meta, 'phase': 'feedback'}, feedback={'correct': correct, 'selected': item['options'][selected], 'answer': correct_option, 'support': support})
+        return ChatReply(f"{heading}\n{support}\n\nELEGISTE\n{item['options'][selected]}\n{explanation}\n\nOPCIÓN RECOMENDADA\n{correct_option}\n{rationale}\n\nQUÉ HACER EN UNA SITUACIÓN REAL\n{item['consequence']}", ['Ver mi resumen' if index == 3 else 'Continuar al siguiente paso', '🎯 Hacer una simulación'], sources=simulation['sources'], simulation={**meta, 'phase': 'feedback'}, feedback={'correct': correct, 'selected': item['options'][selected], 'answer': correct_option, 'support': support})
 
     # --------------------------------------------------------
     # EVALUACIÓN DE RIESGO DIGITAL
@@ -1937,31 +1923,23 @@ def answer_message(message: str, session_id: str) -> ChatReply:
             level = "🟢 BAJO"
 
             explanation = (
-                "Tus respuestas muestran un nivel preventivo favorable. "
-                "En general, presentas hábitos que reducen la exposición "
-                "a riesgos relacionados con cuentas, información personal, "
-                "navegación y servicios digitales.\n\n"
-                "Esto no significa que estés completamente protegido. "
-                "La seguridad digital requiere mantener y actualizar "
-                "las buenas prácticas de manera constante."
+                "Tus hábitos actuales reducen varios riesgos comunes. "
+                "Mantén estas prácticas y revísalas periódicamente."
             )
 
         elif percentage <= 66:
             level = "🟡 MODERADO"
 
             explanation = (
-                "Tus respuestas muestran una combinación de buenas prácticas "
-                "y hábitos que podrían mejorarse.\n\n"
-                "Existe una exposición moderada a determinados riesgos "
-                "digitales. Se recomienda priorizar las áreas donde "
-                "seleccionaste respuestas intermedias o de mayor riesgo."
+                "Tienes buenas prácticas, pero hay hábitos que conviene mejorar. "
+                "Empieza por las áreas que aparecen primero en las recomendaciones."
             )
 
         else:
             level = "🔴 ALTO"
             explanation = (
-                "Tus respuestas muestran prácticas que pueden aumentar tu exposición a riesgos digitales. "
-                "Prioriza las mejoras en contraseñas, autenticación, privacidad, navegación y compras."
+                "Algunos hábitos pueden aumentar tu exposición a riesgos digitales. "
+                "Aplica primero las recomendaciones prioritarias de abajo."
             )
 
         # ----------------------------------------------------
@@ -1999,7 +1977,7 @@ def answer_message(message: str, session_id: str) -> ChatReply:
                 f"Nivel de riesgo preventivo: {level}\n"
                 f"Puntuación: {score}/{max_score} ({percentage}%)\n\n"
 
-                "CÓMO SE CALCULA\nCada respuesta suma 0, 1 o 2 puntos según el criterio preventivo definido. El porcentaje expresa puntos sobre el máximo, no probabilidad de sufrir un incidente. Bajo: hasta 33 %; moderado: hasta 66 %; alto: por encima de 66 %. Son umbrales educativos del prototipo, pendientes de validación.\n\n"
+                "CÓMO LEER ESTE RESULTADO\nCada respuesta suma 0, 1 o 2 puntos. El porcentaje compara tu puntuación con el máximo posible; no indica la probabilidad de sufrir un incidente.\n\n"
                 "📊 INTERPRETACIÓN DE TUS RESPUESTAS\n"
                 f"{interpretation}\n\n"
 
@@ -2010,14 +1988,10 @@ def answer_message(message: str, session_id: str) -> ChatReply:
                 f"{recommendations_text}\n\n"
 
                 "📚 SIGUIENTE PASO\n"
-                "Puedes utilizar el módulo educativo para profundizar "
-                "en los temas que necesitas mejorar o realizar una "
-                "simulación para practicar la toma de decisiones.\n\n"
+                "Elige un tema educativo o una simulación para practicar la mejora que necesitas.\n\n"
 
                 "⚠️ IMPORTANTE\n"
-                "Esta evaluación es educativa y preventiva. No inspecciona "
-                "tus dispositivos, cuentas ni actividad en Internet y no "
-                "determina por sí misma si has sufrido un incidente."
+                "Esta evaluación es educativa. No revisa tus dispositivos, cuentas ni actividad en Internet."
             ),
             [
                 "🎓 Quiero aprender",

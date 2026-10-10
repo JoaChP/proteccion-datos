@@ -35,12 +35,12 @@ FOLLOW_UPS["solicitud"] = (
     [
         ("Comprueba qué datos son necesarios", "Verifica el canal oficial y pregunta cuáles datos son obligatorios, para qué se requieren y quién los tratará. No compartas una fotografía de tu cédula por un enlace sin verificar.", "Revisa la información del tratamiento y conserva constancia. Que una entidad solicite identificación no demuestra por sí solo un uso indebido.", "El artículo 5 de la Ley N.º 8968 regula información previa y consentimiento, con excepciones; el artículo 6 aborda calidad y adecuación de los datos."),
         ("Aclara la finalidad antes de entregar información", "Pregunta quién solicita los datos, con qué finalidad, quién podrá recibirlos y qué ocurre si no los proporcionas. Detén el envío por canales que no puedas verificar.", "Solicita una explicación de la necesidad de los datos. Si necesitas orientación sobre su tratamiento en Costa Rica, consulta PRODHAB.", "El artículo 5 contempla información previa; el artículo 6 relaciona los datos con su finalidad. No toda solicitud exige consentimiento: existen excepciones legales."),
-        ("Consulta a la entidad responsable", "Utiliza el canal oficial para solicitar información sobre los datos tratados y su finalidad. Conserva la solicitud y la respuesta.", "Consulta el procedimiento para ejercer los derechos que correspondan y busca orientación en PRODHAB si la situación no queda clara.", "El artículo 7 regula derechos sobre los datos. El asistente no determina si procede una solicitud concreta ni resuelve reclamaciones.")
+        ("Consulta a la entidad responsable", "Usa su canal oficial y pregunta qué datos tiene, para qué los usa y con quién los comparte. Guarda la solicitud y la respuesta.", "Si la respuesta no aclara tu caso, revisa el procedimiento oficial o consulta a PRODHAB.", "El artículo 7 de la Ley N.º 8968 reconoce derechos sobre tus datos. Este asistente explica los pasos generales; no decide reclamos ni reemplaza el trámite oficial.")
     ])
 
 LEGAL_CONTEXT = {
-    "datos": "Artículos 6 y 7: los datos deben corresponder a su finalidad y ser exactos. Puedes solicitar acceso, rectificación o supresión según corresponda. Identifica al responsable y conserva constancia de tu gestión; no toda petición implica eliminación automática.",
-    "solicitud": "Artículo 5: antes de recopilar datos deben explicarte la finalidad, los destinatarios, el responsable y si responder es obligatorio. El consentimiento expreso tiene excepciones legales. Artículo 6: comprueba que los datos solicitados se relacionen con la finalidad.",
+    "datos": "Ley N.º 8968, artículos 6 y 7: los datos deben ser pertinentes y exactos. Puedes pedir acceso, corrección o supresión cuando corresponda. Identifica a la entidad responsable y guarda constancia de tu gestión.",
+    "solicitud": "Ley N.º 8968, artículos 5 y 6: antes de entregar datos, deben explicarte para qué los necesitan, quién los tratará y si son obligatorios. Verifica que lo solicitado tenga relación con esa finalidad.",
 }
 
 def guidance_sources(topic):
@@ -50,6 +50,9 @@ def action_plan(topic, choice, context):
     question, options, plans = FOLLOW_UPS[topic]
     title, first, next_step, learning = plans[context]
     legal = f"\n\nFUNDAMENTO · LEY N.º 8968\n{LEGAL_CONTEXT[topic]}" if topic in LEGAL_CONTEXT else ""
-    return (f"TU SITUACIÓN\n{options[context][3:]}\n\nPRIMERO · {title}\n{first}"
-            f"\n\nDESPUÉS\n{next_step}\n\nPARA LA PRÓXIMA VEZ\n{learning}"
-            "\n\nTE ACOMPAÑAMOS\nPuedes revisar otra situación o practicar sin utilizar datos reales. Estas acciones son orientación educativa; no confirman un incidente ni su resultado." )
+    return (f"RESUMEN DE TU SITUACIÓN\n{options[context][3:]}\n\n"
+            f"QUÉ HACER AHORA\n{first}\n\n"
+            f"SIGUIENTE PASO\n{next_step}\n\n"
+            f"RECUERDA\n{learning}"
+            f"{legal}\n\n"
+            "Esta es orientación educativa. No confirma un incidente ni sustituye a la institución competente.")

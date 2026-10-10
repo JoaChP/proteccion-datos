@@ -68,3 +68,10 @@ CREATE TABLE IF NOT EXISTS chatbot_contacts (
     notes TEXT,
     reviewed_at DATE
 );
+
+-- Tracks curated content releases without storing visitor conversations.
+CREATE TABLE IF NOT EXISTS chatbot_metadata (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);

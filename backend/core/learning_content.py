@@ -4,7 +4,16 @@ from .chat_sources import LAW, PRIVACY, PRODHAB, CSIRT
 NIST = {"title": "National Institute of Standards and Technology. (2024). El Marco de Seguridad Cibernética (CSF) 2.0 del NIST (NIST CSWP 29 spa).", "url": "https://doi.org/10.6028/NIST.CSWP.29.spa"}
 
 def unit(label, title, concept, example, practice, sources):
-    return {"label": label, "title": title, "content": f"CONCEPTO CLAVE\n{concept}\n\nEN LA VIDA COTIDIANA\n{example}\n\nAPLICA LO APRENDIDO\n{practice}", "sources": sources}
+    return {
+        "label": label,
+        "title": title,
+        "content": (
+            f"EN RESUMEN\n{concept}\n\n"
+            f"EJEMPLO\n{example}\n\n"
+            f"QUÉ HACER\n{practice}"
+        ),
+        "sources": sources,
+    }
 
 PLAIN_TOPICS = {
     'phishing': unit('Mensajes engañosos (phishing)', 'Antes de hacer clic, verifica', 'El phishing es un engaño que intenta que entregues datos, dinero o acceso. Puede llegar por correo, mensajes o llamadas.', 'Un aviso imita a tu banco y te presiona para compartir un código. El logotipo y tu nombre no prueban que sea auténtico.', 'Detén la interacción. Abre la aplicación oficial por tu cuenta o busca un contacto oficial independiente. No compartas contraseñas ni códigos.', [PRIVACY]),
@@ -15,7 +24,7 @@ PLAIN_TOPICS = {
     'privacy': unit('Privacidad en redes sociales', 'Compartir menos también es protegerte', 'La audiencia y los datos publicados influyen en tu privacidad. Un perfil privado limita quién ve algo, pero no evita todas las copias.', 'Una foto revela tu documento, dirección o ubicación. Un contacto puede hacer una captura y reenviarla.', 'Revisa los datos visibles y la audiencia antes de publicar. Evita documentos y códigos. Comprueba permisos y accesos de otras aplicaciones.', [PRIVACY]),
     'internet': unit('Navegar con más seguridad', 'Comprueba el sitio antes de compartir datos', 'La dirección del sitio y la forma de llegar a él importan. HTTPS cifra la conexión; no demuestra que el comercio o la solicitud sean legítimos.', 'Un enlace lleva a una página muy parecida a una tienda conocida, pero la dirección es distinta.', 'Accede por un canal que hayas comprobado, revisa el dominio y detente ante solicitudes inesperadas de datos o dinero.', [PRIVACY]),
     'personal_data': unit('Qué son tus datos personales', 'Información que permite identificarte', 'Un dato personal se relaciona con una persona identificada o identificable. Varios datos combinados también pueden identificarla.', 'Tu correo y datos de una compra pueden vincularse contigo, aunque no aparezca tu nombre completo.', 'Antes de entregarlos, pregunta quién los solicita, para qué y cómo se protegen. No todos los datos personales pertenecen a la categoría legal de datos sensibles.', [LAW, PRODHAB]),
-    'law': unit('Tus derechos y la Ley 8968', 'Conocer qué ocurre con tus datos', 'La Ley 8968 es una referencia de protección de datos personales en Costa Rica. Ayuda a entender el tratamiento de tus datos y el ejercicio de derechos.', 'Encuentras información incorrecta sobre ti en los registros de una entidad y quieres conocer cómo solicitar su corrección.', 'Identifica a la entidad responsable y su canal de atención. Consulta los requisitos oficiales, conserva tu solicitud y, si necesitas orientación, revisa los canales de PRODHAB.', [LAW, PRODHAB]),
+    'law': unit('Tus derechos y la Ley 8968', 'Conocer qué ocurre con tus datos', 'La Ley N.º 8968 protege los datos personales en Costa Rica. Te ayuda a saber quién usa tus datos, para qué y qué puedes solicitar.', 'Una entidad tiene un dato tuyo incorrecto y quieres pedir que lo corrija.', 'Identifica a la entidad responsable, usa su canal oficial y guarda tu solicitud. Si necesitas orientación, consulta a PRODHAB.', [LAW, PRODHAB]),
 }
 
 EXTENDED_TOPICS = {
@@ -69,8 +78,8 @@ def assessment_report(questions, answers):
 
 
 PLAIN_TOPICS['law']['content'] += (
-    "\n\nFUNDAMENTO · LEY N.º 8968\n"
-    "Artículo 4: autodeterminación informativa. Artículo 5: información previa y consentimiento, con excepciones. "
-    "Artículo 6: calidad y finalidad. Artículo 7: acceso, rectificación y supresión según corresponda. "
-    "Consulta el texto original y el procedimiento oficial para tu situación."
+    "\n\nBASE LEGAL · LEY N.º 8968\n"
+    "Artículo 4: control sobre el uso de tu información. Artículo 5: información previa y consentimiento, con excepciones. "
+    "Artículo 6: los datos deben ser adecuados para su finalidad. Artículo 7: derechos de acceso, rectificación y supresión, según corresponda. "
+    "Consulta el procedimiento oficial para tu caso."
 )
