@@ -22,6 +22,18 @@ export default function Navbar() {
     setMenuOpen(false)
   }, [location])
 
+  useEffect(() => {
+    if (!menuOpen) return
+    const closeOnEscape = event => {
+      if (event.key === 'Escape') {
+        setMenuOpen(false)
+        document.querySelector('.navbar__hamburger')?.focus()
+      }
+    }
+    window.addEventListener('keydown', closeOnEscape)
+    return () => window.removeEventListener('keydown', closeOnEscape)
+  }, [menuOpen])
+
   const navLinks = [
     { label: t.nav.home,           href: '/' },
     { label: t.nav.dataProtection, href: '/proteccion-datos' },
@@ -52,6 +64,7 @@ export default function Navbar() {
             <Link
               key={link.href}
               to={link.href}
+              aria-current={location.pathname === link.href ? 'page' : undefined}
               className={`navbar__link${location.pathname === link.href ? ' navbar__link--active' : ''}`}
             >
               {link.label}
@@ -94,6 +107,7 @@ export default function Navbar() {
             className="navbar__hamburger"
             onClick={() => setMenuOpen(o => !o)}
             aria-expanded={menuOpen}
+            aria-controls="mobile-navigation"
             aria-label="Menú de navegación"
           >
             {menuOpen ? <X size={22} /> : <Menu size={22} />}
@@ -103,11 +117,12 @@ export default function Navbar() {
 
       {/* Mobile menu */}
       {menuOpen && (
-        <nav className="navbar__mobile" aria-label="Navegación móvil">
+        <nav id="mobile-navigation" className="navbar__mobile" aria-label="Navegación móvil">
           {navLinks.map(link => (
             <Link
               key={link.href}
               to={link.href}
+              aria-current={location.pathname === link.href ? 'page' : undefined}
               className={`navbar__mobile-link${location.pathname === link.href ? ' navbar__mobile-link--active' : ''}`}
             >
               {link.label}
